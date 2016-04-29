@@ -1,0 +1,69 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("[Classroom]", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" id="dropdownCommonMenu" data-toggle="dropdown"><i class="fa fa-users" aria-hidden="true"> Users</i>
+</a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownCommonMenu">
+                            <li role="menuitem">@Html.ActionLink("Manage Roles", "Index", "RoleManager")</li>
+                            <li role="menuitem">@Html.ActionLink("Students", "Index", "Students")</li>
+                            <li role="menuitem">@Html.ActionLink("Instructors", "Index", "Instructors")</li>
+                            <li role="menuitem">@Html.ActionLink("Admininistrators", "Index", "Admins")</li>
+
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" id="dropdownCommonMenu" data-toggle="dropdown">Tasks</a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownCommonMenu">
+                            <li role="menuitem">@Html.ActionLink("Semesters", "Index", "Semesters")</li>
+                            <li role="menuitem">@Html.ActionLink("Courses", "Index", "Courses")</li>
+                            <li role="menuitem">@Html.ActionLink("Departments", "Index", "Departments")</li>
+                            <li role="menuitem">@Html.ActionLink("Classrooms", "Index", "VirtualClassrooms")</li>
+                            <li role="menuitem">@Html.ActionLink("Assignments", "Index", "Assignments")</li>
+
+                        </ul>
+                    </li>
+                </ul>
+                @Html.Partial("_LoginPartial")
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p><i class="fa fa-university" aria-hidden="true"></i> Classroom</p>
+        </footer>
+    </div>
+
+    
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
