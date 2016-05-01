@@ -1,0 +1,71 @@
+﻿@model IEnumerable<Classroom.Models.VirtualClassroom>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Classrooms</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Course.CourseTitle)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Semester.SemesterTitle)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ClassroomTitle)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Instructors)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Students)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Course.CourseTitle)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Semester.SemesterTitle)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.ClassroomTitle)
+        </td>
+        <td>
+            @if (item.Instructors.Count() == 0)
+            {
+                <span>No Instructors</span>
+            }
+            else
+            {
+                <span>@item.Instructors.Count() Instructor(s)</span>
+            }
+        </td>
+        <td>
+            @if (item.Students.Count() == 0)
+                {
+                <span>No Students</span>
+            }
+            else
+            {
+                <span>@item.Students.Count() Student(s)</span>
+            }
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.VirtualClassroomId }) |
+            @Html.ActionLink("Details", "Details", new { id=item.VirtualClassroomId }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.VirtualClassroomId })
+        </td>
+    </tr>
+}
+
+</table>

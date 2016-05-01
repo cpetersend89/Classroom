@@ -15,16 +15,13 @@
             @Html.DisplayNameFor(model => model.TaskTitle)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.TaskDescription)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.TaskAvailable)
-        </th>
-        <th>
             @Html.DisplayNameFor(model => model.AvailableDate)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.DueDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.VirtualClassrooms)
         </th>
         <th>Total Files</th>
         <th></th>
@@ -37,16 +34,20 @@
                 @Html.DisplayFor(modelItem => item.TaskTitle)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TaskDescription)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TaskAvailable)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.AvailableDate)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.DueDate)
+            </td>
+            <td>
+                @if (item.VirtualClassrooms.Count() == 0)
+                {
+                    <span>No Classrooms</span>
+                }
+                else
+                {
+                    <span>@item.VirtualClassrooms.Count() Classroom(s)</span>
+                }
             </td>
             <td>
                 @if (item.FileDetails.Count() == 0)
@@ -58,6 +59,7 @@
                     <span>@item.FileDetails.Count() File(s)</span>
                 }
             </td>
+
             <td>
                 @Html.ActionLink("Edit", "Edit", new {id = item.AssignmentId}) |
                 @Html.ActionLink("Details", "Details", new {id = item.AssignmentId}) |

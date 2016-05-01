@@ -11,6 +11,7 @@ namespace Classroom.Models
     {
         [Key]
         public int TestId { get; set; }
+        public virtual ICollection<VirtualClassroom> VirtualClassrooms { get; set; }
         public virtual ICollection<TestFileDetails> FileDetails { get; set; }
     }
 }

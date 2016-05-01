@@ -12,6 +12,10 @@ namespace Classroom.Models
         [Key]
         public int AssignmentId { get; set; }
 
+        public virtual ICollection<VirtualClassroom> VirtualClassrooms { get; set; }
+        public virtual ICollection<CompletedAssignment> CompletedAssignments { get; set; }
+        public virtual ICollection<CompletedAssignmentFileDetails> CompletedAssignmentsFileDetails { get; set; }
+
         public virtual ICollection<AssignmentFileDetail> FileDetails { get; set; }
     }
 }

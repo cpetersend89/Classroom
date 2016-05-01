@@ -19,6 +19,7 @@ namespace Classroom.ViewModels
         [Display(Name = "Name")]
         public string FullName => $"{LastName}, {FirstName}";
 
+        [Required]
         [Display(Name = "Email")]
         [EmailAddress]
         public string Email { get; set; }

@@ -33,18 +33,21 @@ namespace Classroom.Models
             return new ApplicationDbContext();
         }
         public DbSet<Student> Students { get; set; }
+        public DbSet<Instructor> Instructors { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<AssignmentFileDetail> AssignmentFileDetails { get; set; }
+        public DbSet<CompletedAssignmentFileDetails> CompletedAssignmentFileDetails { get; set; }
         public DbSet<TestFileDetails> TestFileDetails { get; set; }
         public DbSet<SyllabusFileDetails> SyllabusFileDetails { get; set; }
         public DbSet<Grade> Grades { get; set; }
-        public DbSet<Instructor> Instructors { get; set; }
+
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
+        public DbSet<CompletedAssignment> CompletedAssignments { get; set; }
 
         public DbSet<Semester> Semesters { get; set; }
 
-        public System.Data.Entity.DbSet<Classroom.Models.VirtualClassroom> VirtualClassrooms { get; set; }
+        public DbSet<VirtualClassroom> VirtualClassrooms { get; set; }
     }
 }

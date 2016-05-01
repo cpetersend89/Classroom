@@ -19,8 +19,13 @@ namespace Classroom.Models
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime EnrollmentDate { get; set; }
+
+        //public int GradeId { get; set; }
+
         public virtual Grade Grade { get; set; }
+
+        public virtual ICollection<VirtualClassroom> VirtualClassrooms { get; set; }
+
         public virtual ICollection<Assignment> CompletedAssignments { get; set; }
-        public virtual ICollection<Course> Courses { get; set; }
     }
 }

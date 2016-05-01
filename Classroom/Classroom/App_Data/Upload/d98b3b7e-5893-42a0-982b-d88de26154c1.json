@@ -1,0 +1,14 @@
+{
+	"zip_name" : "package.zip",
+	"zip_contents" : ["daily_paint__671___panda_quickie_by_cryptid_creations-d802cri.jpg", "Drogba-jpeg.jpg", "jpeg.jpeg", "Logo-Tri-lox+large(JPEG).jpg", "page04b.jpg", "procyon.jpg", "Sarah McGraw(1).jpg", "T-Rex's_The_Good_Dinosaur_03.jpeg", "ye000009.jpeg" ],
+	"directory_structure" : {
+		"image_themes" : {
+			"animals" : ["daily_paint__671___panda_quickie_by_cryptid_creations-d802cri.jpg", "T-Rex's_The_Good_Dinosaur_03.jpeg"],
+			"people" : ["Drogba-jpeg.jpg", "jpeg.jpeg", "Sarah McGraw(1).jpg"],
+			"misc" : {
+				"text" : ["Logo-Tri-lox+large(JPEG).jpg", "page04b.jpg"],
+				"maps" : ["procyon.jpg", "ye000009.jpeg"]
+			}
+		}
+	}
+}

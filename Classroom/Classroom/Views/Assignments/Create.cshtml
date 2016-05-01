@@ -58,11 +58,39 @@
             </div>
 
             <div class="form-group">
-                @Html.Label("Files:", htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.Label("Files:", htmlAttributes: new {@class = "control-label col-md-2"})
                 <div class="col-md-10">
                     <input type="file" name="file" multiple="multiple"/>
                 </div>
             </div>
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <table>
+                        <tr>
+                            @{
+                                int cnt = 0;
+                                List<Classroom.ViewModels.AssignedClassroomData> classrooms = ViewBag.VirtualClassrooms;
+
+                                foreach (var classroom in classrooms)
+                                {
+                                    if (cnt++ % 3 == 0)
+                                    {
+                                        @:</tr><tr>
+                                }
+                                    @:<td>
+                                        <input type="checkbox"
+                                               name="selectedClassrooms"
+                                               value="@classroom.VirtualClassroomId"
+                                               @(Html.Raw(classroom.Assigned ? "checked=\"checked\"" : "")) />
+                                        @classroom.VirtualClassroomId @: @classroom.ClassroomTitle
+                                        @:</td>
+                            }
+                                @:</tr>
+                            }
+                        </table>
+                    </div>
+                </div>
 
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">

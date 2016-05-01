@@ -5,15 +5,55 @@ using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Classroom.Models;
+using Classroom.ViewModels;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
 
 namespace Classroom.Controllers
 {
     public class AssignmentsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
+        private ApplicationSignInManager _signInManager;
+        private ApplicationUserManager _userManager;
+
+        public AssignmentsController()
+        {
+        }
+
+        public AssignmentsController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
+        {
+            UserManager = userManager;
+            SignInManager = signInManager;
+        }
+
+        public ApplicationSignInManager SignInManager
+        {
+            get
+            {
+                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
+            }
+            private set
+            {
+                _signInManager = value;
+            }
+        }
+
+        public ApplicationUserManager UserManager
+        {
+            get
+            {
+                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+            }
+            private set
+            {
+                _userManager = value;
+            }
+        }
 
         // GET: Assignments
         public ActionResult Index()
@@ -39,16 +79,29 @@ namespace Classroom.Controllers
         // GET: Assignments/Create
         public ActionResult Create()
         {
+            var assignment = new Assignment();
+            assignment.VirtualClassrooms = new List<VirtualClassroom>();
+            PopulateAssignedClassroomData(assignment);
             return View();
         }
 
         // POST: Assignments/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "AssignmentId,TaskTitle,TaskDescription,TaskAvailable,AvailableDate,DueDate")] Assignment assignment)
+        public ActionResult Create([Bind(Include = "AssignmentId,TaskTitle,TaskDescription,TaskAvailable,AvailableDate,DueDate")] Assignment assignment, string[] selectedClassrooms)
         {
+            if (selectedClassrooms != null)
+            {
+                assignment.VirtualClassrooms = new List<VirtualClassroom>();
+                foreach (var classroom in selectedClassrooms)
+                {
+                    var classroomToAdd = db.VirtualClassrooms.Find(int.Parse(classroom));
+                    assignment.VirtualClassrooms.Add(classroomToAdd);
+                }
+            }
             if (ModelState.IsValid)
             {
                 List<AssignmentFileDetail> fileDetails = new List<AssignmentFileDetail>();
@@ -77,7 +130,7 @@ namespace Classroom.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-
+            PopulateAssignedClassroomData(assignment);
             return View(assignment);
         }
 
@@ -135,6 +188,46 @@ namespace Classroom.Controllers
                 return RedirectToAction("Index");
             }
             return View(assignment);
+        }
+
+        private void PopulateAssignedClassroomData(Assignment assignment)
+        {
+            ApplicationUser user = UserManager.FindById(User.Identity.GetUserId());
+            var adminVirtualClassrooms = db.VirtualClassrooms;
+            var instructorVirtualClassrooms =
+                db.VirtualClassrooms
+                    .Where(x => x.Instructors.All(i => i.InstructorId == user.Instructor.InstructorId));
+            var assignmentsClassroom = new HashSet<int>(assignment.VirtualClassrooms.Select(c => c.VirtualClassroomId));
+            var viewModel = new List<AssignedClassroomData>();
+            if (User.Identity.IsAuthenticated)
+            {
+                if (User.IsInRole("Admin"))
+                {
+                    foreach (var classroom in adminVirtualClassrooms)
+                    {
+                        viewModel.Add(new AssignedClassroomData
+                        {
+                            VirtualClassroomId = classroom.VirtualClassroomId,
+                            ClassroomTitle = classroom.ClassroomTitle,
+                            Assigned = assignmentsClassroom.Contains(classroom.VirtualClassroomId)
+                        });
+                    }
+                }
+                if (User.IsInRole("Instructor"))
+                {
+                    foreach (var classroom in instructorVirtualClassrooms)
+                    {
+                        viewModel.Add(new AssignedClassroomData
+                        {
+                            VirtualClassroomId = classroom.VirtualClassroomId,
+                            ClassroomTitle = classroom.ClassroomTitle,
+                            Assigned = assignmentsClassroom.Contains(classroom.VirtualClassroomId)
+                        });
+                    }
+                }
+            }
+
+            ViewBag.VirtualClassrooms = viewModel;
         }
 
         [HttpPost]

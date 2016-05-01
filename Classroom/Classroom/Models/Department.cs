@@ -9,6 +9,7 @@ namespace Classroom.Models
 {
     public class Department
     {
+        [Key]
         public int DepartmentId { get; set; }
 
         [StringLength(50, MinimumLength = 3)]

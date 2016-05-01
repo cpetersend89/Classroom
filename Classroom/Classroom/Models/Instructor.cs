@@ -15,13 +15,12 @@ namespace Classroom.Models
         [Display(Name = "Instructor Id")]
         public int InstructorId { get; set; }
 
+        [Display(Name = "Hire Date")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}", ApplyFormatInEditMode = true)]
-        [Display(Name = "Hire Date")]
         public DateTime HireDate { get; set; }
-        public int DepartmentId { get; set; }
-        public virtual Department Department { get; set; }
-        public virtual ICollection<Student> Students { get; set; }
-
+        //public int DepartmentId { get; set; }
+        public virtual ICollection<Department> Department { get; set; }
+        public virtual ICollection<VirtualClassroom> VirtualClassrooms { get; set; }
     }
 }

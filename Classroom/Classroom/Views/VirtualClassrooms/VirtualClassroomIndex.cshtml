@@ -1,0 +1,12 @@
+﻿@model Classroom.ViewModels.VirtualClassroomViewModel
+@{
+    ViewBag.Title = "VirtualClassroomIndex";
+}
+
+<h2>Classroom</h2>
+
+
+<div>
+    @Html.Partial("_assignments", Model.Assignments)
+</div>
+

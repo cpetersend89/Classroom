@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Globalization;
@@ -12,6 +13,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Classroom.Models;
+using Classroom.ViewModels;
 using Microsoft.AspNet.Identity.EntityFramework;
 using PagedList;
 
@@ -119,7 +121,7 @@ namespace Classroom.Controllers
         // GET: Instructors/Create
         public ActionResult Create()
         {
-            ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "DepartmentName");
+            //ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "DepartmentName");
             return View();
         }
 
@@ -143,8 +145,7 @@ namespace Classroom.Controllers
                         FirstName = instructor.FirstName,
                         LastName = instructor.LastName,
                         Email = instructor.Email,
-                        Active = instructor.Active,
-                        DepartmentId = instructor.DepartmentId
+                        Active = instructor.Active
                     }
                 };
                 var instructorRole = db.Roles.FirstOrDefault(x => x.Name == "Instructor");
@@ -167,9 +168,10 @@ namespace Classroom.Controllers
                     ModelState.AddModelError("", error);
                 }
             }
-            ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "DepartmentName", instructor.DepartmentId);
+            //ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "DepartmentName", instructor.Department.DepartmentId);
             return View(instructor);
         }
+
 
         private async Task SendActivationMail(ApplicationUser user)
         {
@@ -202,7 +204,7 @@ namespace Classroom.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "DepartmentName", instructor.DepartmentId);
+            //ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "DepartmentName", instructor.Department.DepartmentId);
             return View(instructor);
         }
 
@@ -219,7 +221,7 @@ namespace Classroom.Controllers
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "DepartmentName", instructor.DepartmentId);
+            //ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "DepartmentName", instructor.Department.DepartmentId);
             return View(instructor);
         }
 
