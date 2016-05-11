@@ -17,6 +17,7 @@ namespace Classroom.Models
         public virtual Semester Semester { get; set; }
         public virtual ICollection<Instructor> Instructors { get; set; }
         public virtual ICollection<Student> Students { get; set; }
+        public virtual ICollection<Syllabus> Syllabus { get; set; }
         public virtual ICollection<Assignment> Assignments { get; set; }
         public virtual ICollection<Test> Tests { get; set; }
 

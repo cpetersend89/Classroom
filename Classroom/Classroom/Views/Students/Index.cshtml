@@ -20,7 +20,7 @@
         </div>
         <button type="submit" class="btn btn-info"><i class="fa fa-search" aria-hidden="true"></i></button>     
     </div>
-        <br /><br/>
+        <br /><br/><br/>
 }
 
 <table class="table table-striped">
@@ -58,9 +58,9 @@
                 @Html.DisplayFor(modelItem => item.Active)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { id = item.StudentId }) |
-                @Html.ActionLink("Details", "Details", new { id = item.StudentId }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.StudentId })
+                @Html.ActionLink(" ", "Edit", new { id = item.StudentId }, new { @class="fa fa-pencil-square-o btn btn-primary btn-sm", title="Edit" })
+                @Html.ActionLink(" ", "Details", new { id = item.StudentId } , new { @class="fa fa-list btn btn-success btn-sm", title = "Details" })
+                @Html.ActionLink(" ", "Delete", new { id = item.StudentId }, new { @class = "fa fa-trash-o btn btn-danger btn-sm", title = "Delete" })
             </td>
         </tr>
     }

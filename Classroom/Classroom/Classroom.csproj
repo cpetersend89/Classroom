@@ -49,6 +49,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -203,6 +204,8 @@
     <Compile Include="Controllers\RoleManagerController.cs" />
     <Compile Include="Controllers\SemestersController.cs" />
     <Compile Include="Controllers\StudentsController.cs" />
+    <Compile Include="Controllers\SyllabusController.cs" />
+    <Compile Include="Controllers\TestsController.cs" />
     <Compile Include="Controllers\VirtualClassroomsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -213,6 +216,8 @@
     <Compile Include="Models\Assignment.cs" />
     <Compile Include="Models\CompletedAssignment.cs" />
     <Compile Include="Models\CompletedAssignmentFileDetails.cs" />
+    <Compile Include="Models\CompletedTest.cs" />
+    <Compile Include="Models\CompletedTestFileDetails.cs" />
     <Compile Include="Models\Course.cs" />
     <Compile Include="Models\Department.cs" />
     <Compile Include="Models\AssignmentFileDetail.cs" />
@@ -233,7 +238,7 @@
     <Compile Include="Models\Syllabus.cs" />
     <Compile Include="Models\SyllabusFileDetails.cs" />
     <Compile Include="Models\Test.cs" />
-    <Compile Include="Models\TestFileDetails.cs" />
+    <Compile Include="Models\TestFileDetail.cs" />
     <Compile Include="ViewModels\UserProfileViewModel.cs" />
     <Compile Include="Models\VirtualClassroom.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -367,12 +372,34 @@
     <Content Include="Views\VirtualClassrooms\Index.cshtml" />
     <Content Include="Views\VirtualClassrooms\_assignments.cshtml" />
     <Content Include="Views\VirtualClassrooms\VirtualClassroomIndex.cshtml" />
-    <Content Include="Views\VirtualClassrooms\CompletedAssignment.cshtml" />
     <Content Include="Views\Home\Login.cshtml" />
+    <Content Include="Views\Home\SendCode.cshtml" />
+    <Content Include="Views\Home\VerifyCode.cshtml" />
+    <Content Include="Views\Shared\_template.cshtml" />
+    <Content Include="Views\Shared\_IndexLayout.cshtml" />
+    <Content Include="Views\Shared\_ClassroomLayout.cshtml" />
+    <Content Include="Views\Tests\Create.cshtml" />
+    <Content Include="Views\Tests\Delete.cshtml" />
+    <Content Include="Views\Tests\Details.cshtml" />
+    <Content Include="Views\Tests\Edit.cshtml" />
+    <Content Include="Views\Tests\Index.cshtml" />
+    <Content Include="Views\VirtualClassrooms\CompletedTest.cshtml" />
+    <Content Include="Views\VirtualClassrooms\_tests.cshtml" />
+    <Content Include="Views\Syllabus\Create.cshtml" />
+    <Content Include="Views\Syllabus\Delete.cshtml" />
+    <Content Include="Views\Syllabus\Details.cshtml" />
+    <Content Include="Views\Syllabus\Edit.cshtml" />
+    <Content Include="Views\Syllabus\Index.cshtml" />
+    <Content Include="Views\VirtualClassrooms\_syllabus.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\Upload\" />
-    <Folder Include="Views\Login\" />
+    <Folder Include="Content\MyTemplate\css\" />
+    <Folder Include="Content\MyTemplate\font-awesome\" />
+    <Folder Include="Content\MyTemplate\fonts\" />
+    <Folder Include="Content\MyTemplate\img\" />
+    <Folder Include="Content\MyTemplate\js\" />
+    <Folder Include="Content\themes\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

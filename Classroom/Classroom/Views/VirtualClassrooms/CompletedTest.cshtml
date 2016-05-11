@@ -1,20 +1,20 @@
-﻿@model Classroom.Models.Assignment
+﻿@model Classroom.Models.Test
 
 @{
-    ViewBag.Title = "CompletedAssignment";
+    ViewBag.Title = "CompletedTest";
 }
 
-<h2>CompletedAssignment</h2>
+<h2>Completed Test</h2>
 
-@using (Html.BeginForm("CompletedAssignment", "VirtualClassrooms", null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("CompletedTest", "VirtualClassrooms", null, FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
-    
+
     <div class="form-horizontal">
-        <h4>CompletedAssignment</h4>
+        <h4>Completed Test</h4>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.AssignmentId)
+        @Html.HiddenFor(model => model.TestId)
 
         <div class="form-group">
             @Html.Label("Files:", htmlAttributes: new { @class = "control-label col-md-2" })

@@ -9,7 +9,7 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-<table class="table">
+<table class="table table-striped">
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.SemesterTitle)
@@ -48,9 +48,9 @@
             }
         </td>
         <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.SemesterId }) |
-            @Html.ActionLink("Details", "Details", new { id=item.SemesterId }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.SemesterId })
+            @Html.ActionLink(" ", "Edit", new { id = item.SemesterId }, new { @class = "fa fa-pencil-square-o btn btn-primary btn-sm", title = "Edit" })
+            @Html.ActionLink(" ", "Details", new { id = item.SemesterId }, new { @class = "fa fa-list btn btn-success btn-sm", title = "Details" })
+            @Html.ActionLink(" ", "Delete", new { id = item.SemesterId }, new { @class = "fa fa-trash-o btn btn-danger btn-sm", title = "Delete" })
         </td>
     </tr>
 }

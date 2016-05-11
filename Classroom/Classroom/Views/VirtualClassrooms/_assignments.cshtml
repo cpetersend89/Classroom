@@ -1,10 +1,8 @@
-﻿@model IEnumerable<Classroom.Models.Assignment>
+﻿@model Classroom.ViewModels.VirtualClassroomViewModel
 
 @{
     ViewBag.Title = "_assignments";
 }
-
-<h4>Assignments</h4>
 
 <!doctype html>
 <html lang="en">
@@ -16,7 +14,7 @@
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <link rel="stylesheet" href="/resources/demos/style.css">
     <script>
-        $(function() {
+        $(function () {
             $("#accordion").accordion({
                 collapsible: true
             });
@@ -24,47 +22,44 @@
     </script>
 </head>
 
-    <body>
+<body>
 
     <div id="accordion">
-        @foreach (var item in Model)
+        @foreach (var item in Model.Assignments)
         {
-            
-            <h3>@Html.DisplayFor(modelItem => item.TaskTitle)<span class="pull-right"><i class="fa fa-calendar" aria-hidden="true"></i> Available: @Html.DisplayFor(modelItem => item.AvailableDate) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-calendar" aria-hidden="true"></i> Due: @Html.DisplayFor(modelItem => item.DueDate)</span> </h3>
-            <div>
+                <h3>@Html.DisplayFor(modelItem => item.TaskTitle)<span class="pull-right"><i class="fa fa-calendar" aria-hidden="true"></i> Available: @Html.DisplayFor(modelItem => item.AvailableDate) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-calendar" aria-hidden="true"></i> Due: @Html.DisplayFor(modelItem => item.DueDate)</span> </h3>
+                <div>
 
-                <form action="VirtualClassrooms\_CompletedAssignments" method="post" enctype = "multipart/form-data">
-                    @Html.HiddenFor(modelItem => item.AssignmentId)
-                    <fieldset class="form-group">
-                        <p>@Html.DisplayFor(modelItem => item.TaskDescription)</p>
-                    </fieldset>
-                    <fieldset class="form-group">
-                        <label><i class="fa fa-file" aria-hidden="true"></i> Supporting Files: </label>
-                        @foreach (var file in item.FileDetails)
-                        {
-                            <a class="btn btn-success btn-sm" href="/Assignments/Download/?p=@(file.FileId + file.Extension)&d=@file.FileName">@file.FileName</a>
-                        }
-                    </fieldset>
-                    <fieldset>
-                        <p>
-                            @Html.ActionLink("Submit Assignment", "CompletedAssignment", new {id = item.AssignmentId}, htmlAttributes: new {@class = "btn btn-primary"})
-                        </p>
-                    </fieldset>
+                        @Html.HiddenFor(modelItem => item.AssignmentId)
+                        <fieldset class="form-group">
+                            <p>@Html.DisplayFor(modelItem => item.TaskDescription)</p>
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <label><i class="fa fa-file" aria-hidden="true"></i> Supporting Files: </label>
+                            @foreach (var file in item.FileDetails)
+                            {
+                                <a class="btn btn-success btn-sm" href="/Assignments/Download/?p=@(file.FileId + file.Extension)&d=@file.FileName">@file.FileName</a>
+                            }
+                        </fieldset>
+                        <fieldset>
+                            <p>
+                                @Html.ActionLink("Submit Assignment", "CompletedAssignment", new { id = item.AssignmentId, vc = Model.VirtualClassroom.VirtualClassroomId }, htmlAttributes: new { @class = "btn btn-info" })
+                            </p>
+                        </fieldset>
 
-                    <fieldset>
-                        <label>Completed Assignment:</label>
-                        @foreach (var file in item.CompletedAssignmentsFileDetails)
-                        {
-                            <a class="btn btn-success btn-sm" href="/Assignments/Download/?p=@(file.FileId + file.Extension)&d=@file.FileName">@file.FileName</a>
-                        }
-                    </fieldset>
-                </form>
-            </div>
+                        <fieldset>
+                            <label>Completed Assignment:</label>
+                            @foreach (var file in item.CompletedAssignmentsFileDetails)
+                            {
+                                <a class="btn btn-success btn-sm" href="/Assignments/Download/?p=@(file.FileId + file.Extension)&d=@file.FileName">@file.FileName</a>
+                            }
+                        </fieldset>
+                </div>
         }
     </div>
 
 
-    </body>
+</body>
 
 </html>
 

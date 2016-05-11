@@ -13,5 +13,7 @@ namespace Classroom.Models
         public string SyllabusTitle { get; set; }
         public string SyllabusDescription { get; set; }
         public virtual ICollection<SyllabusFileDetails> FileDetails { get; set; }
+        public virtual ICollection<VirtualClassroom> VirtualClassrooms { get; set; }
+
     }
 }

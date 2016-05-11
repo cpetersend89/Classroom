@@ -9,6 +9,7 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+
 <table class="table table-striped">
     <tr>
         <th>
@@ -61,39 +62,39 @@
             </td>
 
             <td>
-                @Html.ActionLink("Edit", "Edit", new {id = item.AssignmentId}) |
-                @Html.ActionLink("Details", "Details", new {id = item.AssignmentId}) |
-                <a href="javascript:void(0);" data-id="@item.AssignmentId" class="deleteItem">Delete</a>
+                @Html.ActionLink(" ", "Edit", new { id = item.AssignmentId }, new { @class = "fa fa-pencil-square-o btn btn-primary btn-sm", title = "Edit" })
+                @Html.ActionLink(" ", "Details", new { id = item.AssignmentId }, new { @class = "fa fa-list btn btn-success btn-sm", title = "Details" })
+                <a href="javascript:void(0);" data-id="@item.AssignmentId" class="deleteItem"><i class="fa fa-trash-o btn btn-danger btn-sm"></i></a>
             </td>
         </tr>
     }
 
 </table>
 
-@section Scripts {
 
-    <script>
-        $('.deleteItem').click(function (e) {
-            e.preventDefault();
-            var $ctrl = $(this);
-            if (confirm('Do you really want to delete this item?')) {
-                $.ajax({
-                    url: '@Url.Action("Delete")',
-                    type: 'POST',
-                    data: { id: $(this).data('id') }
-                }).done(function (data) {
-                    if (data.Result == "OK") {
-                        $ctrl.closest('tr').remove();
-                    }
-                    else if (data.Result.Message) {
-                        alert(data.Result.Message);
-                    }
-                }).fail(function () {
-                    alert("There is something wrong. Please try again.");
-                })
+    @section Scripts {
 
-            }
-        });
-    </script>
+        <script>
+            $('.deleteItem').click(function (e) {
+                e.preventDefault();
+                var $ctrl = $(this);
+                if (confirm('Do you really want to delete this item?')) {
+                    $.ajax({
+                        url: '@Url.Action("Delete")',
+                        type: 'POST',
+                        data: { id: $(this).data('id') }
+                    }).done(function (data) {
+                        if (data.Result == "OK") {
+                            $ctrl.closest('tr').remove();
+                        }
+                        else if (data.Result.Message) {
+                            alert(data.Result.Message);
+                        }
+                    }).fail(function () {
+                        alert("There is something wrong. Please try again.");
+                    })
+                }
+            });
+        </script>
 
-}
+    }

@@ -11,6 +11,7 @@ using System.Web;
 using System.Web.Mvc;
 using Classroom.Models;
 using Classroom.ViewModels;
+using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 
@@ -82,12 +83,36 @@ namespace Classroom.Controllers
             }
             return View(adminVirtualClassrooms.ToList());
         }
-        public ActionResult VirtualClassroomIndex()
+
+        public async Task<ActionResult> VirtualClassroomIndex(int? id, VirtualClassroom vc)
         {
-            VirtualClassroomViewModel classroom = new VirtualClassroomViewModel();
-            classroom.Assignments = db.Assignments.ToList();
-            classroom.CompletedAssignments = db.CompletedAssignments.ToList();
-            return View(classroom);
+            ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            if (ModelState.IsValid)
+            {
+                VirtualClassroom virtualClassroom = new VirtualClassroom();
+                if (id == null)
+                {
+                    virtualClassroom =
+                        db.VirtualClassrooms.FirstOrDefault(x => x.VirtualClassroomId == vc.VirtualClassroomId);
+                }
+                else
+                {
+                    virtualClassroom =
+                        db.VirtualClassrooms.FirstOrDefault(x => x.VirtualClassroomId == id);
+                }
+                VirtualClassroomViewModel classroom = new VirtualClassroomViewModel();
+                classroom.Assignments = virtualClassroom.Assignments.OrderBy(d => d.DueDate).ToList();
+                classroom.Tests = virtualClassroom.Tests.ToList();
+                classroom.Syllabus = virtualClassroom.Syllabus.ToList();
+                classroom.CompletedAssignments =
+                    db.CompletedAssignments.Where(x => x.StudentId == user.Student.StudentId).ToList();
+                classroom.VirtualClassroom = virtualClassroom;
+                classroom.CompletedTests = db.CompletedTests.Where(x => x.StudentId == user.Student.StudentId).ToList();
+                return View(classroom);
+
+
+            }
+            return RedirectToAction("About", "Home");
         }
 
         // GET: VirtualClassrooms/Details/5
@@ -340,34 +365,20 @@ namespace Classroom.Controllers
             }
         }
 
-        public ActionResult CompletedAssignment(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Assignment assignment = db.Assignments.Include(s => s.FileDetails).SingleOrDefault(x => x.AssignmentId == id);
-            if (assignment == null)
-            {
-                return HttpNotFound();
-            }
-            return View(assignment);
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CompletedAssignment(CompletedAssignment assignment, Assignment assignments)
+        public async Task<ActionResult> CompletedAssignment(VirtualClassroomViewModel classroom, CompletedAssignment completedAssignment, int? id)
         {
             ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-            if (ModelState.IsValid)
+            Assignment assignment = db.Assignments.Include(s => s.FileDetails).SingleOrDefault(x => x.AssignmentId == id);
             {
                 List<CompletedAssignmentFileDetails> fileDetails = new List<CompletedAssignmentFileDetails>();
                 var studentAssignment = new CompletedAssignment()
                 {
-                    CompletedAssignmentId = assignment.CompletedAssignmentId,
-                    CompletedDateTime = assignment.CompletedDateTime,
+                    CompletedAssignmentId = completedAssignment.CompletedAssignmentId,
+                    CompletedDateTime = completedAssignment.CompletedDateTime,
                     StudentId = user.Student.StudentId,
-                    AssignmentId = assignments.AssignmentId
+                    AssignmentId = assignment.AssignmentId
                 };
                 for (int i = 0; i < Request.Files.Count; i++)
                 {
@@ -382,7 +393,7 @@ namespace Classroom.Controllers
                             Extension = Path.GetExtension(fileName),
                             FileId = Guid.NewGuid(),
                             StudentId = user.Student.StudentId,
-                            AssignmentId = assignments.AssignmentId
+                            AssignmentId = assignment.AssignmentId
                         };
                         fileDetails.Add(fileDetail);
 
@@ -391,13 +402,128 @@ namespace Classroom.Controllers
                         file.SaveAs(path);
                     }
                 }
-                studentAssignment.CompletedAssignments = fileDetails;
+                studentAssignment.CompletedAssignmentsFileDetails = fileDetails;
                 db.CompletedAssignments.Add(studentAssignment);
                 db.SaveChanges();
-                return RedirectToAction("VirtualClassroomIndex");
+                new JsonResult { Data = "Successfully " };
+                return RedirectToAction("VirtualClassroomIndex", new { id = classroom.VirtualClassroom.VirtualClassroomId });
             }
+        }
 
-            return View(assignments);
+        [HttpPost]
+        public JsonResult DeleteCompletedAssignment(string id)
+        {
+            if (String.IsNullOrEmpty(id))
+            {
+                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return Json(new { Result = "Error" });
+            }
+            try
+            {
+                Guid guid = new Guid(id);
+                CompletedAssignmentFileDetails fileDetail = db.CompletedAssignmentFileDetails.Find(guid);
+                if (fileDetail == null)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    return Json(new { Result = "Error" });
+                }
+
+                //Remove from database
+                db.CompletedAssignmentFileDetails.Remove(fileDetail);
+                db.SaveChanges();
+
+                //Delete file from the file system
+                var path = Path.Combine(Server.MapPath("~/App_Data/Upload/"), fileDetail.FileId + fileDetail.Extension);
+                if (System.IO.File.Exists(path))
+                {
+                    System.IO.File.Delete(path);
+                }
+                return Json(new { Result = "OK" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "ERROR", Message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CompletedTest(VirtualClassroomViewModel classroom, CompletedTest completedTest, int? id)
+        {
+            ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            Test test = db.Tests.Include(s => s.FileDetails).SingleOrDefault(x => x.TestId == id);
+            {
+                List<CompletedTestFileDetails> fileDetails = new List<CompletedTestFileDetails>();
+                var studentTest = new CompletedTest()
+                {
+                    CompletedTestId = completedTest.CompletedTestId,
+                    CompletedDateTime = completedTest.CompletedDateTime,
+                    StudentId = user.Student.StudentId,
+                    TestId = test.TestId
+                };
+                for (int i = 0; i < Request.Files.Count; i++)
+                {
+                    var file = Request.Files[i];
+
+                    if (file != null && file.ContentLength > 0)
+                    {
+                        var fileName = Path.GetFileName(file.FileName);
+                        CompletedTestFileDetails fileDetail = new CompletedTestFileDetails()
+                        {
+                            FileName = fileName,
+                            Extension = Path.GetExtension(fileName),
+                            FileId = Guid.NewGuid(),
+                            StudentId = user.Student.StudentId,
+                            TestId = test.TestId
+                        };
+                        fileDetails.Add(fileDetail);
+
+                        var path = Path.Combine(Server.MapPath("~/App_Data/Upload/"),
+                            fileDetail.FileId + fileDetail.Extension);
+                        file.SaveAs(path);
+                    }
+                }
+                studentTest.CompletedTestsFileDetails = fileDetails;
+                db.CompletedTests.Add(studentTest);
+                db.SaveChanges();
+                return RedirectToAction("VirtualClassroomIndex", new { id = classroom.VirtualClassroom.VirtualClassroomId });
+            }
+        }
+
+        [HttpPost]
+        public JsonResult DeleteCompletedTest(string id)
+        {
+            if (String.IsNullOrEmpty(id))
+            {
+                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return Json(new { Result = "Error" });
+            }
+            try
+            {
+                Guid guid = new Guid(id);
+                CompletedTestFileDetails fileDetail = db.CompletedTestFileDetails.Find(guid);
+                if (fileDetail == null)
+                {
+                    Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    return Json(new { Result = "Error" });
+                }
+
+                //Remove from database
+                db.CompletedTestFileDetails.Remove(fileDetail);
+                db.SaveChanges();
+
+                //Delete file from the file system
+                var path = Path.Combine(Server.MapPath("~/App_Data/Upload/"), fileDetail.FileId + fileDetail.Extension);
+                if (System.IO.File.Exists(path))
+                {
+                    System.IO.File.Delete(path);
+                }
+                return Json(new { Result = "OK" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { Result = "ERROR", Message = ex.Message });
+            }
         }
 
         // GET: VirtualClassrooms/Delete/5
@@ -424,6 +550,14 @@ namespace Classroom.Controllers
             db.VirtualClassrooms.Remove(virtualClassroom);
             db.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        public async Task<ActionResult> _assignments(VirtualClassroomViewModel assignments)
+        {
+            ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            assignments.Assignments =
+                db.Assignments.Include(x => x.CompletedAssignments.Where(a => a.StudentId == user.Student.StudentId)).ToList();
+            return View(assignments);
         }
 
         public async Task<ActionResult> _assignments([Bind(Include = "AssignmentId,TaskTitle,TaskDescription,TaskAvailable,AvailableDate,DueDate")] Assignment assignment)
@@ -457,6 +591,43 @@ namespace Classroom.Controllers
                 return RedirectToAction("VirtualClassroomIndex");
             }
             return PartialView(db.Assignments.ToList());
+        }
+        public async Task<ActionResult> _tests([Bind(Include = "TestId,TaskTitle,TaskDescription,TaskAvailable,AvailableDate,DueDate")] Test test)
+        {
+            ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            if (ModelState.IsValid)
+            {
+                for (int i = 0; i < Request.Files.Count; i++)
+                {
+                    var file = Request.Files[i];
+
+                    if (file != null && file.ContentLength > 0)
+                    {
+                        var fileName = Path.GetFileName(file.FileName);
+                        CompletedTestFileDetails fileDetail = new CompletedTestFileDetails()
+                        {
+                            FileName = fileName,
+                            Extension = Path.GetExtension(fileName),
+                            FileId = Guid.NewGuid(),
+                            TestId = test.TestId,
+                            StudentId = user.Student.StudentId
+                        };
+                        var path = Path.Combine(Server.MapPath("~/App_Data/Upload/"), fileDetail.FileId + fileDetail.Extension);
+                        file.SaveAs(path);
+
+                        db.Entry(fileDetail).State = EntityState.Added;
+                    }
+                }
+                db.Entry(test).State = EntityState.Modified;
+                db.SaveChanges();
+                return RedirectToAction("VirtualClassroomIndex");
+            }
+            return PartialView(db.Tests.ToList());
+        }
+        public ActionResult _syllabus()
+        {
+            
+            return PartialView(db.Syllabus.ToList());
         }
 
         protected override void Dispose(bool disposing)

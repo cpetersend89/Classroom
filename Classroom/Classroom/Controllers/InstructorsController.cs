@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.UI.WebControls;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
@@ -64,7 +65,7 @@ namespace Classroom.Controllers
         {
             ViewBag.CurrentSort = sortOrder;
             ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewBag.DateSortParm = sortOrder == "Date" ? "date_desc" : "Date";
+            ViewBag.IdSortParm = sortOrder == "Id" ? "id_desc" : "Id";
             if (searchString != null)
             {
                 page = 1;
@@ -76,7 +77,7 @@ namespace Classroom.Controllers
 
             ViewBag.CurrentFilter = searchString;
             var instructors = from s in db.Instructors
-                           select s;
+                              select s;
             if (!String.IsNullOrEmpty(searchString))
             {
                 instructors = instructors.Where(s => s.LastName.Contains(searchString)
@@ -87,11 +88,11 @@ namespace Classroom.Controllers
                 case "name_desc":
                     instructors = instructors.OrderByDescending(s => s.LastName);
                     break;
-                case "Date":
-                    instructors = instructors.OrderBy(s => s.HireDate);
+                case "Id":
+                    instructors = instructors.OrderBy(s => s.InstructorId);
                     break;
-                case "date_desc":
-                    instructors = instructors.OrderByDescending(s => s.HireDate);
+                case "id_desc":
+                    instructors = instructors.OrderByDescending(s => s.InstructorId);
                     break;
                 default:
                     instructors = instructors.OrderBy(s => s.LastName);
@@ -185,82 +186,82 @@ namespace Classroom.Controllers
               new { userId = user.Id, code = code },
               protocol: Request.Url.Scheme);
 
-            string body = $"<h4>Hello {user.Instructor.FirstName}, welcome to Classroom!</h4>" +
+            string body = $"<h4>Hello {user.Admin.FirstName}, welcome to Classroom!</h4>" +
                           $"<p>To get started, please <a href='{callbackUrl}'>activate</a> your account.</p>" +
                           $"<p>The account must be activated within 24 hours from receiving this mail.</p>";
 
             await UserManager.SendEmailAsync(user.Id, "Welcome to Classroom!", body);
-        }
+    }
 
-        // GET: Instructors/Edit/5
-        public ActionResult Edit(int? id)
+    // GET: Instructors/Edit/5
+    public ActionResult Edit(int? id)
+    {
+        if (id == null)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Instructor instructor = db.Instructors.Find(id);
-            if (instructor == null)
-            {
-                return HttpNotFound();
-            }
-            //ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "DepartmentName", instructor.Department.DepartmentId);
-            return View(instructor);
+            return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
         }
-
-        // POST: Instructors/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "InstructorId,HireDate,FirstName,LastName,DepartmentId,Active")] Instructor instructor)
+        Instructor instructor = db.Instructors.Find(id);
+        if (instructor == null)
         {
-            if (ModelState.IsValid)
-            {
-                db.Entry(instructor).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            //ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "DepartmentName", instructor.Department.DepartmentId);
-            return View(instructor);
+            return HttpNotFound();
         }
+        //ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "DepartmentName", instructor.Department.DepartmentId);
+        return View(instructor);
+    }
 
-        // GET: Instructors/Delete/5
-        public ActionResult Delete(int? id)
+    // POST: Instructors/Edit/5
+    // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+    // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult Edit([Bind(Include = "InstructorId,HireDate,FirstName,LastName,DepartmentId,Active")] Instructor instructor)
+    {
+        if (ModelState.IsValid)
         {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Instructor instructor = db.Instructors.Find(id);
-            if (instructor == null)
-            {
-                return HttpNotFound();
-            }
-            return View(instructor);
-        }
-
-        // POST: Instructors/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Instructor instructor = db.Instructors.Find(id);
-            var user = db.Users.FirstOrDefault(x => x.Instructor.InstructorId == id);
-            db.Users.Remove(user);
-            db.SaveChanges();
-            db.Instructors.Remove(instructor);
+            db.Entry(instructor).State = EntityState.Modified;
             db.SaveChanges();
             return RedirectToAction("Index");
         }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+        //ViewBag.DepartmentId = new SelectList(db.Departments, "DepartmentId", "DepartmentName", instructor.Department.DepartmentId);
+        return View(instructor);
     }
+
+    // GET: Instructors/Delete/5
+    public ActionResult Delete(int? id)
+    {
+        if (id == null)
+        {
+            return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+        }
+        Instructor instructor = db.Instructors.Find(id);
+        if (instructor == null)
+        {
+            return HttpNotFound();
+        }
+        return View(instructor);
+    }
+
+    // POST: Instructors/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public ActionResult DeleteConfirmed(int id)
+    {
+        Instructor instructor = db.Instructors.Find(id);
+        var user = db.Users.FirstOrDefault(x => x.Instructor.InstructorId == id);
+        db.Users.Remove(user);
+        db.SaveChanges();
+        db.Instructors.Remove(instructor);
+        db.SaveChanges();
+        return RedirectToAction("Index");
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            db.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+}
 }

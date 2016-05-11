@@ -38,10 +38,10 @@ namespace Classroom.Models
         public DbSet<Department> Departments { get; set; }
         public DbSet<AssignmentFileDetail> AssignmentFileDetails { get; set; }
         public DbSet<CompletedAssignmentFileDetails> CompletedAssignmentFileDetails { get; set; }
-        public DbSet<TestFileDetails> TestFileDetails { get; set; }
+        public DbSet<TestFileDetail> TestFileDetails { get; set; }
+        public DbSet <CompletedTestFileDetails> CompletedTestFileDetails { get; set; }
         public DbSet<SyllabusFileDetails> SyllabusFileDetails { get; set; }
         public DbSet<Grade> Grades { get; set; }
-
         public DbSet<Admin> Admins { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
         public DbSet<CompletedAssignment> CompletedAssignments { get; set; }
@@ -49,5 +49,10 @@ namespace Classroom.Models
         public DbSet<Semester> Semesters { get; set; }
 
         public DbSet<VirtualClassroom> VirtualClassrooms { get; set; }
+
+        public DbSet<Test> Tests { get; set; }
+        public DbSet<CompletedTest> CompletedTests { get; set; }
+
+        public System.Data.Entity.DbSet<Classroom.Models.Syllabus> Syllabus { get; set; }
     }
 }

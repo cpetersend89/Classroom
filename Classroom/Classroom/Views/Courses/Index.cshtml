@@ -9,37 +9,39 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Department.DepartmentName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.CourseTitle)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.CourseDescription)
-        </th>
-        <th></th>
-    </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Department.DepartmentName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.CourseTitle)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.CourseDescription)
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.CourseId }) |
-            @Html.ActionLink("Details", "Details", new { id=item.CourseId }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.CourseId })
-        </td>
-    </tr>
-}
+    <table class="table table-striped">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Department.DepartmentName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CourseTitle)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CourseDescription)
+            </th>
+            <th></th>
+        </tr>
 
-</table>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Department.DepartmentName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CourseTitle)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CourseDescription)
+                </td>
+                <td>
+                    @Html.ActionLink(" ", "Edit", new { id = item.CourseId }, new { @class = "fa fa-pencil-square-o btn btn-primary btn-sm", title = "Edit" })
+                    @Html.ActionLink(" ", "Details", new { id = item.CourseId }, new { @class = "fa fa-list btn btn-success btn-sm", title = "Details" })
+                    @Html.ActionLink(" ", "Delete", new { id = item.CourseId }, new { @class = "fa fa-trash-o btn btn-danger btn-sm", title = "Delete" })
+                </td>
+            </tr>
+        }
+
+    </table>

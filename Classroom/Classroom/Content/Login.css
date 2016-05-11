@@ -5336,6 +5336,10 @@ a.list-group-item:focus {
 
 .panel-body {
   padding: 15px;
+  padding-right: 30px;
+    padding-bottom: 50px;
+    padding-top: 30px;
+
 }
 
 .panel-body:before,
@@ -6827,6 +6831,6 @@ body {
 
 .panel-default {
 opacity: 0.9;
-margin-top:70px;
+margin-top:150px;
 }
 .form-group.last { margin-bottom:0px; }

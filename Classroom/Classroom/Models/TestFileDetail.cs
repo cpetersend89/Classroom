@@ -6,7 +6,7 @@ using System.Web;
 
 namespace Classroom.Models
 {
-    public class TestFileDetails
+    public class TestFileDetail
     {
         [Key]
         public Guid FileId { get; set; }

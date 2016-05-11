@@ -1,0 +1,99 @@
+﻿@model IEnumerable<Classroom.Models.Test>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Assignments</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table table-striped">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.TaskTitle)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.AvailableDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.DueDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.VirtualClassrooms)
+        </th>
+        <th>Total Files</th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TaskTitle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AvailableDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DueDate)
+            </td>
+            <td>
+                @if (item.VirtualClassrooms.Count() == 0)
+                {
+                    <span>No Classrooms</span>
+                }
+                else
+                {
+                    <span>@item.VirtualClassrooms.Count() Classroom(s)</span>
+                }
+            </td>
+            <td>
+                @if (item.FileDetails.Count() == 0)
+                {
+                    <span>No File</span>
+                }
+                else
+                {
+                    <span>@item.FileDetails.Count() File(s)</span>
+                }
+            </td>
+
+            <td>
+                @Html.ActionLink(" ", "Edit", new { id = item.TestId }, new { @class = "fa fa-pencil-square-o btn btn-primary btn-sm", title = "Edit" })
+                @Html.ActionLink(" ", "Details", new { id = item.TestId }, new { @class = "fa fa-list btn btn-success btn-sm", title = "Details" })
+                <a href="javascript:void(0);" data-id="@item.TestId" class="deleteItem"><i class="fa fa-trash-o btn btn-danger btn-sm"></i></a>
+            </td>
+        </tr>
+    }
+
+</table>
+
+@section Scripts {
+
+    <script>
+        $('.deleteItem').click(function (e) {
+            e.preventDefault();
+            var $ctrl = $(this);
+            if (confirm('Do you really want to delete this item?')) {
+                $.ajax({
+                    url: '@Url.Action("Delete")',
+                    type: 'POST',
+                    data: { id: $(this).data('id') }
+                }).done(function (data) {
+                    if (data.Result == "OK") {
+                        $ctrl.closest('tr').remove();
+                    }
+                    else if (data.Result.Message) {
+                        alert(data.Result.Message);
+                    }
+                }).fail(function () {
+                    alert("There is something wrong. Please try again.");
+                })
+
+            }
+        });
+    </script>
+
+}
