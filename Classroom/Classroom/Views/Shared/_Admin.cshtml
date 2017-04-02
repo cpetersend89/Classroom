@@ -1,0 +1,106 @@
+﻿@using Microsoft.AspNet.Identity
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Classroom</title>
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/themes/base/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jqueryui")
+    <script src="https://use.fontawesome.com/2b3a0c0d9a.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Covered+By+Your+Grace" rel="stylesheet"> 
+
+
+    <meta name="description" content="The description of my page"/>
+</head>
+<body>
+
+<div class="container">
+    <nav class="navbar navbar-default admin navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <ul class="nav navbar-nav navbar-right">
+            <li>
+                <a class="" href="#"><i class="fa fa-globe" aria-hidden="true"></i></a>
+            </li>
+            <li>
+                <a class="" href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i></a>
+            </li>
+            <li>
+                <a class="" href="#"><i class="fa fa-bell-o" aria-hidden="true"></i></a>
+            </li>
+        </ul>
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            @Html.ActionLink("Classroom", "Index", "Home", new {area = ""}, new {@class = "admin-navbar-brand"})
+        </div>
+
+        <div class="navbar-default admin sidebar" role="navigation">
+
+
+            <div class="sidebar-nav navbar-collapse">
+                <div class="placeholder">
+                    <img src="~/Images/Christian-Peterson.jpg" class="img-fluid" alt="Generic placeholder thumbnail" height="200" width="200">
+                    <p>Hello, @User.Identity.GetUserName()</p>
+                </div>
+                <ul class="nav admin-menu" id="side-menu">
+                    <li>
+                        <a class="admin-link" href="@Url.Action("AdminDashboard", "Home")"><i class="fa fa-tachometer" aria-hidden="true"></i>Dashboard</a>
+                    </li>
+                    <li>
+                        <a class="admin-link" href="@Url.Action("CreateUser", "Account")"><i class="fa fa-user-plus" aria-hidden="true"></i>Create User</a>
+                    </li>
+                    <li>
+                        <a class="admin-link" href="@Url.Action("Index", "Semesters")"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Semesters</a>
+                    </li>
+                    <li>
+                        <a class="admin-link" href="@Url.Action("Index", "Courses")"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>Courses</a>
+                    </li>
+                    <li>
+                        <a class="admin-link" href="@Url.Action("AdminIndex", "VirtualClassrooms")"><i class="fa fa-users" aria-hidden="true"></i>Classrooms</a>
+                    </li>
+                </ul>
+
+                @if (Request.IsAuthenticated)
+                {
+                    using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new {id = "logoutForm"}))
+                    {
+                        @Html.AntiForgeryToken()
+                        <ul class="nav admin-menu">
+                            <li>
+                                <a class="admin-link" href="javascript:document.getElementById('logoutForm').submit()"><i class="fa fa-power-off" aria-hidden="true"></i>Log off</a>
+
+                            </li>
+                        </ul>
+                    }
+                }
+
+            </div>
+
+        </div>
+    </nav>
+
+    
+
+    <div class="classroom">
+        <div class="row">
+            <div class="col-lg-12">
+                @RenderBody()
+            </div>
+        </div>
+
+    </div>
+</div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

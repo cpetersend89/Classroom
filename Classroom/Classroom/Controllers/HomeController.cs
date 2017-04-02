@@ -1,26 +1,26 @@
-﻿using System;
+﻿using Classroom.Models;
+using Classroom.ViewModels;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Classroom.Models;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin.Security;
-using WebGrease.Css.Extensions;
 
 namespace Classroom.Controllers
 {
     public class HomeController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
+        private readonly ApplicationDbContext _context;
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
         public HomeController()
         {
+            _context = new ApplicationDbContext();
         }
 
         public HomeController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
@@ -31,59 +31,114 @@ namespace Classroom.Controllers
 
         public ApplicationSignInManager SignInManager
         {
-            get
-            {
-                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
-            }
-            private set
-            {
-                _signInManager = value;
-            }
+            get { return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>(); }
+            private set { _signInManager = value; }
         }
 
         public ApplicationUserManager UserManager
         {
-            get
-            {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
-            }
+            get { return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>(); }
+            private set { _userManager = value; }
         }
-        public async Task<ActionResult> Index()
-        {
-            ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
 
+
+        public ActionResult Index()
+        {
             if (User.Identity.IsAuthenticated)
             {
                 if (User.IsInRole("Student"))
                 {
-                    List<VirtualClassroom> studentClassrooms = user.Student.VirtualClassrooms.ToList();
-                    ViewBag.VirtualClassroomId = new SelectList(studentClassrooms, "VirtualClassroomId", "ClassroomTitle");
+                    return RedirectToAction("StudentDashboard");
                 }
                 if (User.IsInRole("Instructor"))
                 {
-                    List<VirtualClassroom> instructorClassrooms = user.Instructor.VirtualClassrooms.ToList();
-                    ViewBag.VirtualClassroomId = new SelectList(instructorClassrooms, "VirtualClassroomId", "ClassroomTitle");
+                    return RedirectToAction("InstructorDashboard");
                 }
-                else if (User.IsInRole("Admin"))
+                if (User.IsInRole("Admin"))
                 {
-                    ViewBag.VirtualClassroomId = new SelectList(db.VirtualClassrooms, "VirtualClassroomId", "ClassroomTitle");
+                    return RedirectToAction("AdminDashboard");
                 }
-                    
             }
-            
             return View();
         }
 
-        public async Task<ActionResult> About()
+        public async Task<ActionResult> StudentDashboard()
+        {
+            var today = DateTime.Now;
+            var future = today.AddDays(7);
+            ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            var viewModel = new VirtualClassroomViewModel
+            {
+                VirtualClassrooms = user.Student.VirtualClassrooms,
+                CompletedAssignments = _context.CompletedAssignments
+                .Include(v => v.VirtualClassroom)
+                .Include(a => a.Assignment)
+                .Where(x => x.StudentId == user.Student.StudentId 
+                && x.Submitted == false
+                && x.Assignment.DueDate >= today 
+                && x.Assignment.DueDate <= future)
+                .OrderBy(a => a.Assignment.DueDate).ToList(),
+                CompletedTests = _context.CompletedTests
+                .Include(v => v.VirtualClassroom)
+                .Include(t => t.Test)
+                .Where(x => x.Student.StudentId == user.Student.StudentId
+                && x.Submitted == false
+                && x.Test.DueDate >= today
+                && x.Test.DueDate <= future)
+                .OrderBy(d => d.Test.DueDate).ToList()
+            };
+            return View(viewModel);
+        }
+
+        public async Task<ActionResult> InstructorDashboard()
         {
             ApplicationUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
-            List<VirtualClassroom> studentClassrooms = user.Student.VirtualClassrooms.ToList();
+            var classrooms = user.Instructor.VirtualClassrooms;
+            var completedAssignments =
+                _context.CompletedAssignments
+                .Include(s => s.Student)
+                .Where(x => x.Submitted && x.Graded == false);
+            var completedTests = _context.CompletedTests
+                .Include(s => s.Student)
+                .Where(x => x.Submitted && x.Graded == false);
+            var viewModel = new VirtualClassroomViewModel
+            {
+                VirtualClassrooms = classrooms,
+                CompletedAssignments = new List<CompletedAssignment>(),
+                CompletedTests = new List<CompletedTest>(),
+                Assignments = new List<Assignment>()
+            };
 
-            ViewBag.VirtualClassroomId = new SelectList(studentClassrooms, "VirtualClassroomId", "ClassroomTitle");
+            foreach (var classroom in classrooms)
+            {
+                foreach (var assignment in classroom.Assignments)
+                {
+                    viewModel.Assignments.Add(assignment);
+
+                }
+                foreach (var completedAssignment in completedAssignments.Where(x => x.VirtualClassroomId == classroom.Id))
+                {
+                    viewModel.CompletedAssignments.Add(completedAssignment);
+                }
+                foreach (var completedTest in completedTests.Where(x => x.VirtualClassroomId == classroom.Id))
+                {
+                    viewModel.CompletedTests.Add(completedTest);
+                }
+
+            }
+
+            return View(viewModel);
+        }
+
+        public ActionResult AdminDashboard()
+        {
+            return View();
+        }
+
+        public ActionResult About()
+        {
+            ViewBag.Message = "Your application description page.";
+
             return View();
         }
 
@@ -94,179 +149,24 @@ namespace Classroom.Controllers
             return View();
         }
 
-        // GET: /Account/Login
-        [AllowAnonymous]
-        public ActionResult Login(string returnUrl)
+        protected override void Dispose(bool disposing)
         {
-            if (Request.IsAuthenticated)
+            if (disposing)
             {
-                return RedirectToAction("Index");
-            }    
-            ViewBag.ReturnUrl = returnUrl;
-            return View();
-        }
-
-        //
-        // POST: /Account/Login
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, change to shouldLockout: true
-            var result = await SignInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, shouldLockout: false);
-            switch (result)
-            {
-                case SignInStatus.Success:
-                    return RedirectToLocal(returnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.RequiresVerification:
-                    return RedirectToAction("SendCode", new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
-                case SignInStatus.Failure:
-                default:
-                    ModelState.AddModelError("", "Invalid login attempt.");
-                    return View(model);
-            }
-        }
-
-        // GET: /Account/SendCode
-        [AllowAnonymous]
-        public async Task<ActionResult> SendCode(string returnUrl, bool rememberMe)
-        {
-            var userId = await SignInManager.GetVerifiedUserIdAsync();
-            if (userId == null)
-            {
-                return View("Error");
-            }
-            var userFactors = await UserManager.GetValidTwoFactorProvidersAsync(userId);
-            var factorOptions = userFactors.Select(purpose => new SelectListItem { Text = purpose, Value = purpose }).ToList();
-            return View(new SendCodeViewModel { Providers = factorOptions, ReturnUrl = returnUrl, RememberMe = rememberMe });
-        }
-
-        //
-        // POST: /Account/SendCode
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> SendCode(SendCodeViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View();
-            }
-
-            // Generate the token and send it
-            if (!await SignInManager.SendTwoFactorCodeAsync(model.SelectedProvider))
-            {
-                return View("Error");
-            }
-            return RedirectToAction("VerifyCode", new { Provider = model.SelectedProvider, ReturnUrl = model.ReturnUrl, RememberMe = model.RememberMe });
-        }
-        [AllowAnonymous]
-        public async Task<ActionResult> VerifyCode(string provider, string returnUrl, bool rememberMe)
-        {
-            // Require that the user has already logged in via username/password or external login
-            if (!await SignInManager.HasBeenVerifiedAsync())
-            {
-                return View("Error");
-            }
-            return View(new VerifyCodeViewModel { Provider = provider, ReturnUrl = returnUrl, RememberMe = rememberMe });
-        }
-
-        //
-        // POST: /Account/VerifyCode
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> VerifyCode(VerifyCodeViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            // The following code protects for brute force attacks against the two factor codes. 
-            // If a user enters incorrect codes for a specified amount of time then the user account 
-            // will be locked out for a specified amount of time. 
-            // You can configure the account lockout settings in IdentityConfig
-            var result = await SignInManager.TwoFactorSignInAsync(model.Provider, model.Code, isPersistent: model.RememberMe, rememberBrowser: model.RememberBrowser);
-            switch (result)
-            {
-                case SignInStatus.Success:
-                    return RedirectToLocal(model.ReturnUrl);
-                case SignInStatus.LockedOut:
-                    return View("Lockout");
-                case SignInStatus.Failure:
-                default:
-                    ModelState.AddModelError("", "Invalid code.");
-                    return View(model);
-            }
-        }
-
-        #region Helpers
-        // Used for XSRF protection when adding external logins
-        private const string XsrfKey = "XsrfId";
-
-        private IAuthenticationManager AuthenticationManager
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().Authentication;
-            }
-        }
-
-        private void AddErrors(IdentityResult result)
-        {
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError("", error);
-            }
-        }
-
-        private ActionResult RedirectToLocal(string returnUrl)
-        {
-            if (Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            return RedirectToAction("Index", "Home");
-        }
-
-        internal class ChallengeResult : HttpUnauthorizedResult
-        {
-            public ChallengeResult(string provider, string redirectUri)
-                : this(provider, redirectUri, null)
-            {
-            }
-
-            public ChallengeResult(string provider, string redirectUri, string userId)
-            {
-                LoginProvider = provider;
-                RedirectUri = redirectUri;
-                UserId = userId;
-            }
-
-            public string LoginProvider { get; set; }
-            public string RedirectUri { get; set; }
-            public string UserId { get; set; }
-
-            public override void ExecuteResult(ControllerContext context)
-            {
-                var properties = new AuthenticationProperties { RedirectUri = RedirectUri };
-                if (UserId != null)
+                if (_userManager != null)
                 {
-                    properties.Dictionary[XsrfKey] = UserId;
+                    _userManager.Dispose();
+                    _userManager = null;
                 }
-                context.HttpContext.GetOwinContext().Authentication.Challenge(properties, LoginProvider);
+
+                if (_signInManager != null)
+                {
+                    _signInManager.Dispose();
+                    _signInManager = null;
+                }
+                _context.Dispose();
             }
+            base.Dispose(disposing);
         }
-        #endregion
     }
 }

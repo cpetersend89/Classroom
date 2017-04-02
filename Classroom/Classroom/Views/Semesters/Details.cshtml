@@ -2,50 +2,51 @@
 
 @{
     ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Admin.cshtml";
 }
 
 <h2>Details</h2>
 
 <div>
-    <h4>Semester</h4>
-    <hr />
+    <h4>Semester: @Model.Title</h4>
+    <hr/>
+
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.SemesterTitle)
+            @Html.DisplayNameFor(model => model.Title)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.SemesterTitle)
+            @Html.DisplayFor(model => model.Title)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.SemesterStartDate)
+            @Html.DisplayNameFor(model => model.Active)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.SemesterStartDate)
+            @Html.DisplayFor(model => model.Active)
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.SemesterEndDate)
+            @Html.DisplayNameFor(model => model.StartDate)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.SemesterEndDate)
+            @Html.DisplayFor(model => model.StartDate)
         </dd>
+
         <dt>
-            @Html.DisplayNameFor(model => model.Courses)
+            @Html.DisplayNameFor(model => model.EndDate)
         </dt>
+
         <dd>
-            @foreach (var course in Model.Courses)
-            {
-                @course.CourseId @: @course.CourseTitle<br />
-            }
+            @Html.DisplayFor(model => model.EndDate)
         </dd>
 
     </dl>
 </div>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.SemesterId }) |
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     @Html.ActionLink("Back to List", "Index")
 </p>

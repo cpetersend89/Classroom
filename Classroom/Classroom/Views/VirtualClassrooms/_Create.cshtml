@@ -1,0 +1,63 @@
+﻿@model Classroom.ViewModels.VirtualClassroomFormViewModel
+
+
+@using (Html.BeginForm("Create", "VirtualClassrooms"))
+{
+    @Html.AntiForgeryToken()
+
+
+
+    <div class="col-md-6">
+        <div class="form-group">
+            @Html.LabelFor(m => m.ClassroomName)
+            @Html.TextBoxFor(m => m.ClassroomName, new { @class = "form-control", autofocus = "autofocus" })
+            @Html.ValidationMessageFor(m => m.ClassroomName, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.SemesterId)
+            @Html.DropDownListFor(m => m.SemesterId, new SelectList(Model.Semesters, "Id", "Title"), "", new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.SemesterId, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.CourseId)
+            @Html.DropDownListFor(m => m.CourseId, new SelectList(Model.Courses, "Id", "Name"), "", new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.CourseId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                @Html.LabelFor(m => m.Instructors)
+                <div class="form-group checkboxlist">
+                    @foreach (var instructor in Model.Instructors)
+                {
+                        <input type="checkbox" name="selectedInstructors" value="@instructor.InstructorId" />
+                        @instructor.FullName<br />
+                    }
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.Students)
+                <div class="form-group checkboxlist">
+                    @foreach (var student in Model.Students)
+                {
+                        <input type="checkbox" name="selectedStudents" value="@student.StudentId" />
+                        @student.FullName<br />
+                    }
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+
+}
+
+@section Scripts{
+    @Scripts.Render("~/bundles/jqueryval")
+}
+

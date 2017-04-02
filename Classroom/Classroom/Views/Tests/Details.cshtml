@@ -2,12 +2,13 @@
 
 @{
     ViewBag.Title = "Details";
+    Layout = "~/Views/Shared/_Instructor.cshtml";
 }
 
 <h2>Details</h2>
 
 <div>
-    <h4>Test</h4>
+    <h4>Assignment: @Model.TaskTitle</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -49,6 +50,24 @@
         <dd>
             @Html.DisplayFor(model => model.DueDate)
         </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PointsWorth)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.PointsWorth)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Classrooms)
+        </dt>
+        <dd>
+            @foreach (var classroom in Model.Classrooms)
+            {
+                @Html.Display(classroom.ClassroomName)
+            }
+        </dd>
         <dt>
             @Html.Label("Files:")
         </dt>
@@ -57,16 +76,17 @@
             @foreach (var item in Model.FileDetails)
             {
 
-                <a class="btn btn-success btn-sm" href="/Tests/Download/?p=@(item.FileId + item.Extension)&d=@item.FileName">@item.FileName</a>
+                <a class="btn btn-success btn-sm" href="/Assignments/Download/?p=@(item.FileId + item.Extension)&d=@item.FileName">@item.FileName</a>
                         <p></p>
             }
 
         </dd>
 
-    </dl>
 
+
+    </dl>
 </div>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.TestId }) |
+    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     @Html.ActionLink("Back to List", "Index")
 </p>

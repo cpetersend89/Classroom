@@ -1,134 +1,55 @@
-﻿
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
-    <!-- Bootstrap Core CSS - Uses Bootswatch Flatly Theme: http://bootswatch.com/flatly/ -->
-    <link href="@Url.Content("~/Content/MyTemplate/")css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="@Url.Content("~/Content/MyTemplate/")css/freelancer.css" rel="stylesheet">
-    <link rel="stylesheet" href="/resources/demos/style.css">
-    <!-- Custom Fonts -->
-    <link href="@Url.Content("~/Content/MyTemplate/")font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
-    <link href="http://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
-    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
-        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-    <!-- jQuery -->
-    <script src="@Url.Content("~/Content/MyTemplate/")js/jquery.js"></script>
-    <script src="@Url.Content("~/Content/MyTemplate/")js/jquery-ui.js"></script>
-    <!-- Bootstrap Core JavaScript -->
-    <script src="@Url.Content("~/Content/MyTemplate/")js/bootstrap.min.js"></script>
-    <!-- Plugin JavaScript -->
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
-    <script src="@Url.Content("~/Content/MyTemplate/")js/classie.js"></script>
-    <script src="@Url.Content("~/Content/MyTemplate/")js/cbpAnimatedHeader.js"></script>
-    <!-- Contact Form JavaScript -->
-    <script src="@Url.Content("~/Content/MyTemplate/")js/jqBootstrapValidation.js"></script>
-    <script src="@Url.Content("~/Content/MyTemplate/")js/contact_me.js"></script>
-    <!-- Custom Theme JavaScript -->
-    <script src="@Url.Content("~/Content/MyTemplate/")js/freelancer.js"></script>
-    @Styles.Render("~Content/jqueryuicss")
+    <title>@ViewBag.Title - Classroom</title>
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/themes/base/css")
+    @Scripts.Render("~/bundles/modernizr")
+    <script src="https://use.fontawesome.com/2b3a0c0d9a.js"></script>
 
+    <meta name="description" content="The description of my page" />
 </head>
 <body>
-
-    <!-- Navigation -->
-    <nav class="navbar navbar-collapse navbar-fixed-top">
-        <div class="container">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header page-scroll">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                    <span class="sr-only">Toggle navigation</span>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#page-top">
-                    @Html.ActionLink("{Classroom}", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-                </a>
+                @Html.ActionLink("Classroom", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
             </div>
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="hidden">
-                        <a href="#page-top"></a>
-                    </li>
-
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        if (User.IsInRole("Admin"))
-                        {
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" id="dropdownCommonMenu" data-toggle="dropdown">Admin</a>
-                                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownCommonMenu">
-                                    <li class="dropdown-header">Manage Users:</li>
-                                    <li class="divider"></li>
-                                    <li role="menuitem">@Html.ActionLink("Manage Roles", "Index", "RoleManager")</li>
-                                    <li role="menuitem">@Html.ActionLink("Students", "Index", "Students")</li>
-                                    <li role="menuitem">@Html.ActionLink("Instructors", "Index", "Instructors")</li>
-                                    <li role="menuitem">@Html.ActionLink("Admininistrators", "Index", "Admins")</li>
-                                    <li class="divider"></li>
-                                    <li class="dropdown-header">Manage Classrooms:</li>
-                                    <li class="divider"></li>
-                                    <li role="menuitem">@Html.ActionLink("Semesters", "Index", "Semesters")</li>
-                                    <li role="menuitem">@Html.ActionLink("Courses", "Index", "Courses")</li>
-                                    <li role="menuitem">@Html.ActionLink("Departments", "Index", "Departments")</li>
-                                    <li role="menuitem">@Html.ActionLink("Classrooms", "Index", "VirtualClassrooms")</li>
-                                </ul>
-                            </li>
-                        }
-                    }
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        if (User.IsInRole("Instructor"))
-                        {
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" id="dropdownCommonMenu" data-toggle="dropdown">Instructor</a>
-                                <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownCommonMenu">
-                                    <li role="menuitem">@Html.ActionLink("Assignments", "Index", "Assignments")</li>
-                                    <li role="menuitem">@Html.ActionLink("Tests", "Index", "Tests")</li>
-                                    <li role="menuitem">@Html.ActionLink("Syllabus", "Index", "Syllabus")</li>
-                                </ul>
-                            </li>
-                        }
-                    }
-
-
-                    @*<li class="page-scroll">
-                            <a href="#portfolio">Portfolio</a>
-                        </li>
-                        <li class="page-scroll">
-                            <a href="#about">About</a>
-                        </li>
-                        <li class="page-scroll">
-                            <a href="#contact">Contact</a>
-                        </li>*@
-                    @Html.Partial("_LoginPartial")
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    @*<li class="dropdown">
+                        <a href="#" class="dropdown-toggle" id="dropdownCommonMenu" data-toggle="dropdown">Menu</a>
+                        <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownCommonMenu">
+                            <li role="menuitem">@Html.ActionLink("Semesters", "Index", "Semesters")</li>
+                            <li role="menuitem">@Html.ActionLink("Classrooms", "AdminIndex", "VirtualClassrooms")</li>
+                            <li role="menuitem">@Html.ActionLink("Assignments", "Index", "Assignments")</li>
+                            <li role="menuitem">@Html.ActionLink("Courses", "Index", "Courses")</li>
+                            <li role="menuitem">@Html.ActionLink("Create User", "CreateUser", "Account")</li>
+                        </ul>
+                    </li>*@
                 </ul>
-
+                @Html.Partial("_LoginPartial")
             </div>
-            <!-- /.navbar-collapse -->
         </div>
-        <!-- /.container-fluid -->
-    </nav>
-<div class="container body-content">
-    <br/><br/><br/><br/><br/><br/>
-    @RenderBody()
-</div>
+    </div>
+    <div class="container">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Classroom</p>
+        </footer>
+    </div>
 
-    @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/jqueryui")
-    @*@Scripts.Render("~/bundles/bootstrap")*@
+    @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
 </body>
 </html>

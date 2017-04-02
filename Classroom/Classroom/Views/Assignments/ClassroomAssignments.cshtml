@@ -1,0 +1,132 @@
+﻿@model Classroom.ViewModels.VirtualClassroomViewModel
+
+@{
+    ViewBag.Title = "Assignments";
+    Layout = "~/Views/Shared/_InstructorClassroom.cshtml";
+}
+
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <label>Assignments</label>
+    </div>
+    <div class="panel-body">
+        <table class="table table-striped">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => Model.AssignmentViewModel.Title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => Model.AssignmentViewModel.AvailableDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => Model.AssignmentViewModel.DueDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => Model.AssignmentViewModel.PointsWorth)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ClassroomId)
+                </th>
+                <th>Supporting Files</th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CompletedAssignments)
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model.Assignments)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TaskTitle)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AvailableDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DueDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PointsWorth)
+                    </td>
+                    <td>
+                        @if (!item.Classrooms.Any())
+                        {
+                            <span>No Classrooms</span>
+                        }
+                        else
+                        {
+                            <span>
+                                @item.Classrooms.Count() Classroom(s)
+                            </span>
+                        }
+                    </td>
+                    <td>
+                        @if (!item.FileDetails.Any())
+                        {
+                            <span>No File</span>
+                        }
+                        else
+                        {
+
+                            <span>@item.FileDetails.Count() File(s)</span>
+                        }
+                    </td>
+
+
+                    <td>
+                        @if (!Model.CompletedAssignments.Any(s => s.AssignmentId == item.Id && s.Submitted && s.Graded == false))
+                        {
+                            <span>No New Submissions</span>
+                        }
+                        else
+                        {
+                            <span><a href="@Url.Action("Index", "CompletedAssignments", new {id = item.Id, classroomId = Model.VirtualClassroom.Id})">@Model.CompletedAssignments.Count(s => s.Submitted && s.AssignmentId == item.Id && s.Graded == false) New Submissions</a></span>
+                        }
+
+                    </td>
+
+                    <td>
+                        @Html.ActionLink(" ", "Edit", new { id = item.Id }, new { @class = "fa fa-pencil-square-o btn btn-primary btn-sm", title = "Edit" })
+                        @Html.ActionLink(" ", "Details", new { id = item.Id }, new { @class = "fa fa-list btn btn-success btn-sm", title = "Details" })
+                        <a href="javascript:void(0);" data-id="@item.Id" class="deleteItem"><i class="fa fa-trash-o btn btn-danger btn-sm"></i></a>
+                    </td>
+                </tr>
+            }
+
+        </table>
+
+    </div>
+</div>
+
+
+
+@section Scripts {
+
+
+    <script>
+                $('.deleteItem').click(function (e) {
+                    e.preventDefault();
+                    var $ctrl = $(this);
+                    if (confirm('Do you really want to delete this item?')) {
+                        $.ajax({
+                            url: '@Url.Action("Delete")',
+                            type: 'POST',
+                            data: { id: $(this).data('id') }
+                        }).done(function (data) {
+                            if (data.Result == "OK") {
+                                $ctrl.closest('tr').remove();
+                            }
+                            else if (data.Result.Message) {
+                                alert(data.Result.Message);
+                            }
+                        }).fail(function () {
+                            alert("There is something wrong. Please try again.");
+                        })
+                    }
+                });
+    </script>
+
+}
+
+

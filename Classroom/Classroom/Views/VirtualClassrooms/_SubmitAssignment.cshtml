@@ -1,0 +1,37 @@
+﻿@model Classroom.ViewModels.VirtualClassroomViewModel
+
+@using (Ajax.BeginForm("CompletedAssignment", new { id = Model.Assignment.Id }, new AjaxOptions { HttpMethod = "POST" }, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(model => Model.Assignment.Id)
+    @Html.HiddenFor(model => Model.VirtualClassroom.Id)
+
+    <hr />
+                    <div class="form-group">
+                        <h4>Submit Assignment</h4>
+
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => Model.CompletedAssignment.Title)
+                        @Html.TextBoxFor(model => Model.CompletedAssignment.Title, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => Model.CompletedAssignment.Description)
+                        @Html.TextAreaFor(model => Model.CompletedAssignment.Description, new { @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <label>Attach File</label><br /><br />
+                        <div class="input-group">
+                            <label class="input-group-btn">
+                                <span class="btn btn-primary">
+                                    Browse&hellip; <input type="file" name="file" style="display: none;" multiple>
+                                </span>
+                            </label>
+                            <input type="text" class="form-control" placeholder="No Files Selected" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-info btn-sm">Submit</button>
+                    </div>
+                    <hr />
+}

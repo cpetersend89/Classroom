@@ -1,23 +1,31 @@
-﻿using System;
+﻿using Classroom.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Classroom.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace Classroom.ViewModels
 {
     public class VirtualClassroomViewModel
     {
-        public virtual VirtualClassroom VirtualClassroom { get; set; }
-        public int AssignmentId { get; set; }
-        public virtual Assignment Assignment { get; set; }
-        public virtual ICollection<Assignment> Assignments { get; set; }
-        public int CompletedAssignmentId { get; set; }
-        public virtual CompletedAssignment CompletedAssignment { get; set; }
-        public virtual ICollection<CompletedAssignment> CompletedAssignments { get; set; }
-        public virtual ICollection<Test> Tests { get; set; }
-        public virtual ICollection<CompletedTest> CompletedTests { get; set; }
-        public virtual ICollection<Syllabus> Syllabus { get; set; }
+        [Display(Name = "Classrooms")]
+        public int ClassroomId { get; set; }
+        public VirtualClassroom VirtualClassroom { get; set; }
+        public IEnumerable<VirtualClassroom> VirtualClassrooms { get; set; }
 
+        public Assignment Assignment { get; set; }
+        public Test Test { get; set; }
+
+        public CompletedAssignment CompletedAssignment { get; set; }
+        public CompletedTest CompletedTest { get; set; }
+
+        public ICollection<Assignment> Assignments { get; set; }
+        public ICollection<Test> Tests { get; set; }
+        public ICollection<CompletedAssignmentFileDetails> CompletedAssignmentFileDetails { get; set; }
+        public ICollection<CompletedTestFileDetails> CompletedTestFileDetails { get; set; }
+        public ICollection<CompletedAssignment> CompletedAssignments { get; set; }
+        public ICollection<CompletedTest> CompletedTests { get; set; }
+        public int StudentId { get; set; }
+
+        public GradeBookViewModel GradeBookViewModel { get; set; }
+        public AssignmentViewModel AssignmentViewModel { get; set; }
     }
 }

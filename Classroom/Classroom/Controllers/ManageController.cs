@@ -7,6 +7,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Classroom.Models;
+using Classroom.ViewModels;
 
 namespace Classroom.Controllers
 {

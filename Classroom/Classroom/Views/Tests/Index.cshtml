@@ -1,99 +1,138 @@
-﻿@model IEnumerable<Classroom.Models.Test>
+﻿@model Classroom.ViewModels.VirtualClassroomViewModel
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Tests";
+    Layout = "~/Views/Shared/_Instructor.cshtml";
 }
 
-<h2>Assignments</h2>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
-<table class="table table-striped">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.TaskTitle)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AvailableDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.DueDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.VirtualClassrooms)
-        </th>
-        <th>Total Files</th>
-        <th></th>
-    </tr>
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <label>New Test</label>
+    </div>
+    <div class="panel-body">
+        @Html.Action("_Create", "Tests")
+    </div>
+</div>
 
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.TaskTitle)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AvailableDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DueDate)
-            </td>
-            <td>
-                @if (item.VirtualClassrooms.Count() == 0)
-                {
-                    <span>No Classrooms</span>
-                }
-                else
-                {
-                    <span>@item.VirtualClassrooms.Count() Classroom(s)</span>
-                }
-            </td>
-            <td>
-                @if (item.FileDetails.Count() == 0)
-                {
-                    <span>No File</span>
-                }
-                else
-                {
-                    <span>@item.FileDetails.Count() File(s)</span>
-                }
-            </td>
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <label>Tests</label>
+    </div>
+    <div class="panel-body">
+        <table class="table table-striped">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Test.TaskTitle)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Test.AvailableDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Test.DueDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Test.PointsWorth)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ClassroomId)
+                </th>
+                <th>Supporting Files</th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CompletedTests)
+                </th>
+                <th></th>
+            </tr>
 
-            <td>
-                @Html.ActionLink(" ", "Edit", new { id = item.TestId }, new { @class = "fa fa-pencil-square-o btn btn-primary btn-sm", title = "Edit" })
-                @Html.ActionLink(" ", "Details", new { id = item.TestId }, new { @class = "fa fa-list btn btn-success btn-sm", title = "Details" })
-                <a href="javascript:void(0);" data-id="@item.TestId" class="deleteItem"><i class="fa fa-trash-o btn btn-danger btn-sm"></i></a>
-            </td>
-        </tr>
-    }
+            @foreach (var item in Model.Tests)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TaskTitle)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AvailableDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DueDate)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PointsWorth)
+                    </td>
+                    <td>
+                        @if (!item.Classrooms.Any())
+                        {
+                            <span>No Classrooms</span>
+                        }
+                        else
+                        {
+                            <span>
+                                @item.Classrooms.Count() Classroom(s)
+                            </span>
+                        }
+                    </td>
+                    <td>
+                        @if (!item.FileDetails.Any())
+                        {
+                            <span>No File</span>
+                        }
+                        else
+                        {
 
-</table>
+                            <span>@item.FileDetails.Count() File(s)</span>
+                        }
+                    </td>
 
-@section Scripts {
 
-    <script>
-        $('.deleteItem').click(function (e) {
-            e.preventDefault();
-            var $ctrl = $(this);
-            if (confirm('Do you really want to delete this item?')) {
-                $.ajax({
-                    url: '@Url.Action("Delete")',
-                    type: 'POST',
-                    data: { id: $(this).data('id') }
-                }).done(function (data) {
-                    if (data.Result == "OK") {
-                        $ctrl.closest('tr').remove();
-                    }
-                    else if (data.Result.Message) {
-                        alert(data.Result.Message);
-                    }
-                }).fail(function () {
-                    alert("There is something wrong. Please try again.");
-                })
+                    <td>
+                        @if (!Model.CompletedTests.Any(s => s.Submitted && s.TestId == item.Id && s.Graded == false))
+                        {
+                            <span>No New Submissions</span>
+                        }
+                        else
+                        {
+                            <span><a href="@Url.Action("Index", "CompletedTests", new {id = item.Id})">@Model.CompletedTests.Count(s => s.Submitted && s.TestId == item.Id && s.Graded == false) New Submissions</a></span>
+                        }
 
+                    </td>
+
+                    <td>
+                        @Html.ActionLink(" ", "Edit", new {id = item.Id}, new {@class = "fa fa-pencil-square-o btn btn-primary btn-sm", title = "Edit"})
+                        @Html.ActionLink(" ", "Details", new {id = item.Id}, new {@class = "fa fa-list btn btn-success btn-sm", title = "Details"})
+                        <a href="javascript:void(0);" data-id="@item.Id" class="deleteItem"><i class="fa fa-trash-o btn btn-danger btn-sm"></i></a>
+                    </td>
+                </tr>
             }
-        });
-    </script>
 
-}
+        </table>
+    </div>
+</div>
+
+
+        @section Scripts {
+
+
+            <script>
+                $('.deleteItem').click(function (e) {
+                    e.preventDefault();
+                    var $ctrl = $(this);
+                    if (confirm('Do you really want to delete this item?')) {
+                        $.ajax({
+                            url: '@Url.Action("Delete")',
+                            type: 'POST',
+                            data: { id: $(this).data('id') }
+                        }).done(function (data) {
+                            if (data.Result == "OK") {
+                                $ctrl.closest('tr').remove();
+                            }
+                            else if (data.Result.Message) {
+                                alert(data.Result.Message);
+                            }
+                        }).fail(function () {
+                            alert("There is something wrong. Please try again.");
+                        })
+                    }
+                });
+            </script>
+
+        }

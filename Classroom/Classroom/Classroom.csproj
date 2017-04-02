@@ -9,7 +9,7 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{B0F9A55F-1BCE-4805-B3FE-55BCB8E6AB93}</ProjectGuid>
+    <ProjectGuid>{4EE3425F-A76A-4F87-B768-053B152CC672}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -25,6 +25,10 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,6 +38,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <FilesToIncludeForPublish>AllFilesInTheProject</FilesToIncludeForPublish>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -49,9 +54,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="MvcCheckBoxList, Version=1.4.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MvcCheckBoxList.1.4.5\lib\net45\MvcCheckBoxList.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PagedList, Version=1.17.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
@@ -60,18 +64,6 @@
     </Reference>
     <Reference Include="PagedList.Mvc, Version=4.5.0.0, Culture=neutral, PublicKeyToken=abbb863e9397c5e1, processorArchitecture=MSIL">
       <HintPath>..\packages\PagedList.Mvc.4.5.0.0\lib\net40\PagedList.Mvc.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="SendGrid, Version=6.3.4.0, Culture=neutral, PublicKeyToken=4f047e93159395ca, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sendgrid.6.3.4\lib\SendGrid.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="SendGrid.SmtpApi, Version=1.3.1.0, Culture=neutral, PublicKeyToken=2ae73662c35d80e4, processorArchitecture=MSIL">
-      <HintPath>..\packages\SendGrid.SmtpApi.1.3.1\lib\net40\SendGrid.SmtpApi.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="SendGridMail, Version=6.3.4.0, Culture=neutral, PublicKeyToken=4f047e93159395ca, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sendgrid.6.3.4\lib\SendGridMail.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -87,6 +79,14 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
@@ -141,6 +141,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -193,95 +196,138 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
-    <Compile Include="Controllers\AdminsController.cs" />
     <Compile Include="Controllers\AssignmentsController.cs" />
+    <Compile Include="Controllers\CompletedAssignmentsController.cs" />
+    <Compile Include="Controllers\CompletedTestsController.cs" />
     <Compile Include="Controllers\CoursesController.cs" />
-    <Compile Include="Controllers\DepartmentsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\InstructorsController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
-    <Compile Include="Controllers\RoleManagerController.cs" />
     <Compile Include="Controllers\SemestersController.cs" />
-    <Compile Include="Controllers\StudentsController.cs" />
-    <Compile Include="Controllers\SyllabusController.cs" />
     <Compile Include="Controllers\TestsController.cs" />
     <Compile Include="Controllers\VirtualClassroomsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201607210456369_PopulateUserRoles.cs" />
+    <Compile Include="Migrations\201607210456369_PopulateUserRoles.Designer.cs">
+      <DependentUpon>201607210456369_PopulateUserRoles.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\Admin.cs" />
     <Compile Include="Models\Assignment.cs" />
+    <Compile Include="Models\AssignmentFileDetail.cs" />
     <Compile Include="Models\CompletedAssignment.cs" />
     <Compile Include="Models\CompletedAssignmentFileDetails.cs" />
     <Compile Include="Models\CompletedTest.cs" />
     <Compile Include="Models\CompletedTestFileDetails.cs" />
-    <Compile Include="Models\Course.cs" />
-    <Compile Include="Models\Department.cs" />
-    <Compile Include="Models\AssignmentFileDetail.cs" />
+    <Compile Include="Models\FileDetail.cs" />
     <Compile Include="Models\Grade.cs" />
-    <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Instructor.cs" />
-    <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\Semester.cs" />
     <Compile Include="Models\Student.cs" />
-    <Compile Include="ViewModels\AssignedAssignmentData.cs" />
-    <Compile Include="ViewModels\AssignedClassroomData.cs" />
-    <Compile Include="ViewModels\AssignedCourseData.cs" />
-    <Compile Include="ViewModels\AssignedDepartmentData.cs" />
+    <Compile Include="Models\Syllabus.cs" />
+    <Compile Include="Models\TestFileDetail.cs" />
+    <Compile Include="Models\UserImage.cs" />
+    <Compile Include="Models\UserProfile.cs" />
+    <Compile Include="Models\UserTask.cs" />
+    <Compile Include="Models\Test.cs" />
     <Compile Include="ViewModels\AssignedInstructorData.cs" />
     <Compile Include="ViewModels\AssignedStudentData.cs" />
-    <Compile Include="ViewModels\SemesterIndexData.cs" />
-    <Compile Include="ViewModels\StudentTaskViewModel.cs" />
-    <Compile Include="Models\Syllabus.cs" />
-    <Compile Include="Models\SyllabusFileDetails.cs" />
-    <Compile Include="Models\Test.cs" />
-    <Compile Include="Models\TestFileDetail.cs" />
-    <Compile Include="ViewModels\UserProfileViewModel.cs" />
+    <Compile Include="ViewModels\AssignedUserViewModel.cs" />
+    <Compile Include="ViewModels\AssignmentsFormViewModel.cs" />
+    <Compile Include="ViewModels\AssignmentViewModel.cs" />
+    <Compile Include="ViewModels\CreateUserFormViewModel.cs" />
+    <Compile Include="ViewModels\EditAssignmentViewModel.cs" />
+    <Compile Include="ViewModels\ForgotPasswordViewModel.cs" />
+    <Compile Include="Models\ApplicationDbContext.cs" />
+    <Compile Include="Models\Course.cs" />
+    <Compile Include="Models\ApplicationUser.cs" />
     <Compile Include="Models\VirtualClassroom.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
+    <Compile Include="ViewModels\ExternalLoginConfirmationViewModel.cs" />
+    <Compile Include="ViewModels\ExternalLoginListViewModel.cs" />
+    <Compile Include="ViewModels\ForgotViewModel.cs" />
+    <Compile Include="ViewModels\GradeBookViewModel.cs" />
+    <Compile Include="ViewModels\LoginViewModel.cs" />
+    <Compile Include="ViewModels\ManageViewModels.cs" />
+    <Compile Include="ViewModels\RegisterFromEmailViewModel.cs" />
+    <Compile Include="ViewModels\RegisterViewModel.cs" />
+    <Compile Include="ViewModels\ResetPasswordViewModel.cs" />
+    <Compile Include="ViewModels\SemesterFormViewModel.cs" />
+    <Compile Include="ViewModels\SendCodeViewModel.cs" />
+    <Compile Include="ViewModels\TasksViewModel.cs" />
+    <Compile Include="ViewModels\TestViewModel.cs" />
+    <Compile Include="ViewModels\UserViewModel.cs" />
+    <Compile Include="ViewModels\VerifyCodeViewModel.cs" />
+    <Compile Include="ViewModels\VirtualClassroomFormViewModel.cs" />
     <Compile Include="ViewModels\VirtualClassroomViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\animated.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
-    <Content Include="Content\jquery-ui.css" />
-    <Content Include="Content\jquery-ui.min.css" />
-    <Content Include="Content\jquery-ui.structure.css" />
-    <Content Include="Content\jquery-ui.structure.min.css" />
-    <Content Include="Content\jquery-ui.theme.css" />
-    <Content Include="Content\jquery-ui.theme.min.css" />
-    <Content Include="Content\Login.css" />
     <Content Include="Content\PagedList.css" />
+    <Content Include="Content\themes\base\accordion.css" />
+    <Content Include="Content\themes\base\all.css" />
+    <Content Include="Content\themes\base\autocomplete.css" />
+    <Content Include="Content\themes\base\base.css" />
+    <Content Include="Content\themes\base\button.css" />
+    <Content Include="Content\themes\base\core.css" />
+    <Content Include="Content\themes\base\datepicker.css" />
+    <Content Include="Content\themes\base\dialog.css" />
+    <Content Include="Content\themes\base\draggable.css" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="Content\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="Content\themes\base\images\ui-icons_222222_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_444444_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_454545_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_555555_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_777620_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_777777_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_888888_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_cc0000_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="Content\themes\base\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="Content\themes\base\jquery-ui.css" />
+    <Content Include="Content\themes\base\jquery-ui.min.css" />
+    <Content Include="Content\themes\base\menu.css" />
+    <Content Include="Content\themes\base\progressbar.css" />
+    <Content Include="Content\themes\base\resizable.css" />
+    <Content Include="Content\themes\base\selectable.css" />
+    <Content Include="Content\themes\base\selectmenu.css" />
+    <Content Include="Content\themes\base\Site.css" />
+    <Content Include="Content\themes\base\slider.css" />
+    <Content Include="Content\themes\base\sortable.css" />
+    <Content Include="Content\themes\base\spinner.css" />
+    <Content Include="Content\themes\base\tabs.css" />
+    <Content Include="Content\themes\base\theme.css" />
+    <Content Include="Content\themes\base\tooltip.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="images\chalkboard.jpg" />
-    <Content Include="images\ui-bg_diagonals-small_40_db4865_40x40.png" />
-    <Content Include="images\ui-bg_diagonals-small_50_93c3cd_40x40.png" />
-    <Content Include="images\ui-bg_diagonals-small_50_ff3853_40x40.png" />
-    <Content Include="images\ui-bg_diagonals-small_75_ccd232_40x40.png" />
-    <Content Include="images\ui-bg_dots-medium_80_ffff38_4x4.png" />
-    <Content Include="images\ui-bg_dots-small_35_35414f_2x2.png" />
-    <Content Include="images\ui-bg_white-lines_85_f7f7ba_40x100.png" />
-    <Content Include="images\ui-icons_454545_256x240.png" />
-    <Content Include="images\ui-icons_88a206_256x240.png" />
-    <Content Include="images\ui-icons_c02669_256x240.png" />
-    <Content Include="images\ui-icons_e1e463_256x240.png" />
-    <Content Include="images\ui-icons_ffeb33_256x240.png" />
-    <Content Include="images\ui-icons_ffffff_256x240.png" />
+    <Content Include="Images\chalkboard.jpg" />
+    <Content Include="Images\Christian-Peterson.jpg" />
+    <Content Include="Images\email.jpg" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="Scripts\jquery-1.10.2.js" />
-    <Content Include="Scripts\jquery-1.10.2.min.js" />
+    <None Include="Scripts\jquery-1.12.4.intellisense.js" />
+    <Content Include="Scripts\jquery-1.12.4.js" />
+    <Content Include="Scripts\jquery-1.12.4.min.js" />
+    <Content Include="Scripts\jquery-1.12.4.min.map" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
-    <Content Include="Scripts\jquery-ui.js" />
-    <Content Include="Scripts\jquery-ui.min.js" />
+    <Content Include="Scripts\jquery-ui-1.12.0.js" />
+    <Content Include="Scripts\jquery-ui-1.12.0.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -324,82 +370,67 @@
     <Content Include="Views\Manage\VerifyPhoneNumber.cshtml" />
     <Content Include="Views\Shared\Lockout.cshtml" />
     <Content Include="Views\Shared\_LoginPartial.cshtml" />
-    <Content Include="Views\RoleManager\Create.cshtml" />
-    <Content Include="Views\RoleManager\Index.cshtml" />
-    <Content Include="Views\RoleManager\Edit.cshtml" />
-    <Content Include="Views\RoleManager\ManageUserRoles.cshtml" />
-    <Content Include="Views\Students\Create.cshtml" />
-    <Content Include="Views\Students\Delete.cshtml" />
-    <Content Include="Views\Students\Details.cshtml" />
-    <Content Include="Views\Students\Edit.cshtml" />
-    <Content Include="Views\Students\Index.cshtml" />
-    <Content Include="Views\Account\CreatePasswordFromEmail.cshtml" />
-    <Content Include="Views\Account\CreatePasswordFromEmailConfirmation.cshtml" />
-    <Content Include="Views\Instructors\Create.cshtml" />
-    <Content Include="Views\Instructors\Delete.cshtml" />
-    <Content Include="Views\Instructors\Details.cshtml" />
-    <Content Include="Views\Instructors\Edit.cshtml" />
-    <Content Include="Views\Instructors\Index.cshtml" />
-    <Content Include="Views\Admins\Create.cshtml" />
-    <Content Include="Views\Admins\Delete.cshtml" />
-    <Content Include="Views\Admins\Details.cshtml" />
-    <Content Include="Views\Admins\Edit.cshtml" />
-    <Content Include="Views\Admins\Index.cshtml" />
+    <Content Include="Views\VirtualClassrooms\Create.cshtml" />
+    <Content Include="Views\Courses\Create.cshtml" />
+    <Content Include="Views\Account\CreateUser.cshtml" />
+    <Content Include="Views\Account\RegisterFromEmailConfirmation.cshtml" />
+    <Content Include="Views\Account\RegisterFromEmail.cshtml" />
     <Content Include="Views\Assignments\Create.cshtml" />
     <Content Include="Views\Assignments\Delete.cshtml" />
     <Content Include="Views\Assignments\Details.cshtml" />
     <Content Include="Views\Assignments\Edit.cshtml" />
     <Content Include="Views\Assignments\Index.cshtml" />
-    <Content Include="Views\Courses\Create.cshtml" />
-    <Content Include="Views\Courses\Delete.cshtml" />
+    <Content Include="Views\Courses\Index.cshtml" />
     <Content Include="Views\Courses\Details.cshtml" />
     <Content Include="Views\Courses\Edit.cshtml" />
-    <Content Include="Views\Courses\Index.cshtml" />
-    <Content Include="Views\Departments\Create.cshtml" />
-    <Content Include="Views\Departments\Delete.cshtml" />
-    <Content Include="Views\Departments\Details.cshtml" />
-    <Content Include="Views\Departments\Edit.cshtml" />
-    <Content Include="Views\Departments\Index.cshtml" />
+    <Content Include="Views\Courses\Delete.cshtml" />
     <Content Include="Views\Semesters\Create.cshtml" />
     <Content Include="Views\Semesters\Delete.cshtml" />
     <Content Include="Views\Semesters\Details.cshtml" />
     <Content Include="Views\Semesters\Edit.cshtml" />
     <Content Include="Views\Semesters\Index.cshtml" />
-    <Content Include="Views\VirtualClassrooms\Create.cshtml" />
-    <Content Include="Views\VirtualClassrooms\Delete.cshtml" />
-    <Content Include="Views\VirtualClassrooms\Details.cshtml" />
+    <Content Include="Views\VirtualClassrooms\StudentClassroom.cshtml" />
+    <Content Include="Views\VirtualClassrooms\AdminIndex.cshtml" />
+    <Content Include="Views\Shared\_Student.cshtml" />
+    <Content Include="Views\VirtualClassrooms\ClassroomTasks.cshtml" />
     <Content Include="Views\VirtualClassrooms\Edit.cshtml" />
-    <Content Include="Views\VirtualClassrooms\Index.cshtml" />
-    <Content Include="Views\VirtualClassrooms\_assignments.cshtml" />
-    <Content Include="Views\VirtualClassrooms\VirtualClassroomIndex.cshtml" />
-    <Content Include="Views\Home\Login.cshtml" />
-    <Content Include="Views\Home\SendCode.cshtml" />
-    <Content Include="Views\Home\VerifyCode.cshtml" />
-    <Content Include="Views\Shared\_template.cshtml" />
-    <Content Include="Views\Shared\_IndexLayout.cshtml" />
-    <Content Include="Views\Shared\_ClassroomLayout.cshtml" />
+    <Content Include="Views\VirtualClassrooms\Details.cshtml" />
+    <Content Include="Views\VirtualClassrooms\_SubmitAssignment.cshtml" />
+    <Content Include="Views\VirtualClassrooms\_EditAssignment.cshtml" />
+    <Content Include="Views\VirtualClassrooms\_CompletedAssignment.cshtml" />
+    <Content Include="Views\CompletedAssignments\Index.cshtml" />
+    <Content Include="Views\CompletedAssignments\Edit.cshtml" />
+    <Content Include="Views\VirtualClassrooms\GradeBook.cshtml" />
     <Content Include="Views\Tests\Create.cshtml" />
     <Content Include="Views\Tests\Delete.cshtml" />
     <Content Include="Views\Tests\Details.cshtml" />
     <Content Include="Views\Tests\Edit.cshtml" />
     <Content Include="Views\Tests\Index.cshtml" />
-    <Content Include="Views\VirtualClassrooms\CompletedTest.cshtml" />
-    <Content Include="Views\VirtualClassrooms\_tests.cshtml" />
-    <Content Include="Views\Syllabus\Create.cshtml" />
-    <Content Include="Views\Syllabus\Delete.cshtml" />
-    <Content Include="Views\Syllabus\Details.cshtml" />
-    <Content Include="Views\Syllabus\Edit.cshtml" />
-    <Content Include="Views\Syllabus\Index.cshtml" />
-    <Content Include="Views\VirtualClassrooms\_syllabus.cshtml" />
+    <Content Include="Views\VirtualClassrooms\_CompletedTest.cshtml" />
+    <Content Include="Views\VirtualClassrooms\_SubmitTest.cshtml" />
+    <Content Include="Views\VirtualClassrooms\_Assignments.cshtml" />
+    <Content Include="Views\VirtualClassrooms\_Tests.cshtml" />
+    <Content Include="Views\Shared\_Instructor.cshtml" />
+    <Content Include="Views\Assignments\_Create.cshtml" />
+    <Content Include="Views\Tests\_Create.cshtml" />
+    <Content Include="Views\Shared\_Admin.cshtml" />
+    <Content Include="Views\Semesters\_Create.cshtml" />
+    <Content Include="Views\Courses\_Create.cshtml" />
+    <Content Include="Views\VirtualClassrooms\_Create.cshtml" />
+    <Content Include="Views\Home\StudentDashboard.cshtml" />
+    <Content Include="Views\Shared\_StudentClassroom.cshtml" />
+    <Content Include="Views\Home\InstructorDashboard.cshtml" />
+    <Content Include="Views\Home\AdminDashboard.cshtml" />
+    <Content Include="Views\Shared\_InstructorClassroom.cshtml" />
+    <Content Include="Views\VirtualClassrooms\InstructorClassroom.cshtml" />
+    <Content Include="Views\Assignments\ClassroomAssignments.cshtml" />
+    <Content Include="Views\Tests\ClassroomTests.cshtml" />
+    <Content Include="Views\CompletedTests\Index.cshtml" />
+    <Content Include="Views\CompletedTests\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\Upload\" />
-    <Folder Include="Content\MyTemplate\css\" />
-    <Folder Include="Content\MyTemplate\font-awesome\" />
-    <Folder Include="Content\MyTemplate\fonts\" />
-    <Folder Include="Content\MyTemplate\img\" />
-    <Folder Include="Content\MyTemplate\js\" />
-    <Folder Include="Content\themes\" />
+    <Folder Include="Dtos\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -407,11 +438,33 @@
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
-    <Content Include="Scripts\jquery-1.10.2.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201607210456369_PopulateUserRoles.resx">
+      <DependentUpon>201607210456369_PopulateUserRoles.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
@@ -425,9 +478,9 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>27491</DevelopmentServerPort>
+          <DevelopmentServerPort>2286</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:27491/</IISUrl>
+          <IISUrl>http://localhost:2287/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

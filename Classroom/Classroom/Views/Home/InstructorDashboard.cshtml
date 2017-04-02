@@ -1,0 +1,102 @@
+﻿@model Classroom.ViewModels.VirtualClassroomViewModel
+@{
+    Layout = "~/Views/Shared/_Instructor.cshtml";
+}
+
+<div class="panel panel-info">
+    <div class="panel-heading">
+        New Assignment Submissions
+    </div>
+    <div class="panel-body">
+        @if (Model.CompletedAssignments.Any())
+        {
+            <table class="table table-striped">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(m => m.CompletedAssignment.Student.FullName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.CompletedAssignment.VirtualClassroom.ClassroomName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.CompletedAssignment.Title)
+                    </th>
+                    <th></th>
+                </tr>
+                @foreach (var item in Model.CompletedAssignments)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(m => item.Student.FullName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.VirtualClassroom.ClassroomName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.Title)
+                        </td>
+                        <td>
+                            @Html.ActionLink("View/Grade Assignment", "Edit", "CompletedAssignments", new {id = item.Id, classroomId = item.VirtualClassroomId}, new {@class = "btn btn-primary btn-sm"})
+                        </td>
+                    </tr>
+                }
+
+            </table>
+        }
+        else
+        {
+            <p>There are no new assignment submissions at this time.</p>
+        }
+
+
+    </div>
+</div>
+
+<div class="panel panel-info">
+    <div class="panel-heading">
+        New Test Submissions
+    </div>
+    <div class="panel-body">
+        @if (Model.CompletedTests.Any())
+        {
+            <table class="table table-striped">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(m => m.CompletedTest.Student.FullName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.CompletedTest.VirtualClassroom.ClassroomName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(m => m.CompletedTest.Title)
+                    </th>
+                    <th></th>
+                </tr>
+                @foreach (var item in Model.CompletedTests)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(m => item.Student.FullName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.VirtualClassroom.ClassroomName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(m => item.Title)
+                        </td>
+                        <td>
+                            @Html.ActionLink("View/Grade Assignment", "Edit", "CompletedTests", new { id = item.Id, classroomId = item.VirtualClassroomId }, new { @class = "btn btn-primary btn-sm" })
+                        </td>
+                    </tr>
+                }
+
+            </table>
+        }
+        else
+        {
+            <p>There are no new test submissions at this time.</p>
+        }
+
+
+    </div>
+</div>

@@ -1,0 +1,91 @@
+﻿@model Classroom.ViewModels.VirtualClassroomViewModel
+@{
+    Layout = "~/Views/Shared/_StudentClassroom.cshtml";
+}
+
+<div class="panel panel-success">
+    <div class="panel-heading">Grades</div>
+    <div class="panel-body">
+        <table class="table table-striped">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.GradeBookViewModel.Assignments)
+                </th>
+                <th>
+                    @Html.Label("Points Possible")
+                </th>
+                <th>
+                    @Html.Label("Points Received")
+                </th>
+                <th>
+                    @Html.Label("Grade")
+                </th>
+            </tr>
+            @foreach (var item in Model.GradeBookViewModel.Assignments)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(model => item.TaskTitle)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.PointsWorth)
+                    </td>
+                    @foreach (var comp in Model.GradeBookViewModel.CompletedAssignments)
+                    {
+                        if (item.Id == comp.AssignmentId)
+                        {
+                            <td>
+                                @Html.DisplayFor(model => comp.Grade.PointsReceived)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(model => comp.Grade.GradePercentage)%
+                            </td>
+                        }
+                    }
+
+                </tr>
+            }
+        </table>
+
+        <table class="table table-striped">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.GradeBookViewModel.Tests)
+                </th>
+                <th>
+                    @Html.Label("Points Possible")
+                </th>
+                <th>
+                    @Html.Label("Points Received")
+                </th>
+                <th>
+                    @Html.Label("Grade")
+                </th>
+            </tr>
+            @foreach (var item in Model.GradeBookViewModel.Tests)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(model => item.TaskTitle)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(model => item.PointsWorth)
+                    </td>
+                    @foreach (var comp in Model.GradeBookViewModel.CompletedTests)
+                    {
+                        if (item.Id == comp.TestId)
+                        {
+                            <td>
+                                @Html.DisplayFor(model => comp.Grade.PointsReceived)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(model => comp.Grade.GradePercentage)%
+                            </td>
+                        }
+                    }
+
+                </tr>
+            }
+        </table>
+    </div>
+</div>

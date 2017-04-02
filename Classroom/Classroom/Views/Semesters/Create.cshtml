@@ -2,99 +2,67 @@
 
 @{
     ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Admin.cshtml";
 }
 
-<h2>Create</h2>
+
+<div class="classroom-form">
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
 
 
-@using (Html.BeginForm()) 
-{
-    @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
-        <h4>Semester</h4>
+        <h2>New Semester</h2>
+        <p class="alert alert-info">
+            All fields are <strong>required</strong>.
+        </p>
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
-            @Html.LabelFor(model => model.SemesterTitle, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.SemesterTitle, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.SemesterTitle, "", new { @class = "text-danger" })
-            </div>
+            @Html.LabelFor(model => model.Title)
+            @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control", autofocus = "autofocus" } })
+            @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.SemesterStartDate, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.SemesterStartDate, new { htmlAttributes = new { @class = "form-control", id="datepicker"} })
-                @Html.ValidationMessageFor(model => model.SemesterStartDate, "", new { @class = "text-danger" })
-            </div>
+            @Html.LabelFor(model => model.StartDate)
+            @Html.EditorFor(model => model.StartDate, new { htmlAttributes = new { @class = "form-control", id = "startdatepicker" } })
+            @Html.ValidationMessageFor(model => model.StartDate, "", new { @class = "text-danger" })
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.SemesterEndDate, htmlAttributes: new {@class = "control-label col-md-2"})
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.SemesterEndDate, new {htmlAttributes = new {@class = "form-control", id="datepicker2"} })
-                @Html.ValidationMessageFor(model => model.SemesterEndDate, "", new {@class = "text-danger"})
-            </div>
+            @Html.LabelFor(model => model.EndDate)
+            @Html.EditorFor(model => model.EndDate, new { htmlAttributes = new { @class = "form-control", id = "enddatepicker" } })
+            @Html.ValidationMessageFor(model => model.EndDate, "", new { @class = "text-danger" })
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Create" class="btn btn-default" />
+
         </div>
 
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <table>
-                    <tr>
-                        @{
-                            int cnt = 0;
-                            List<Classroom.ViewModels.AssignedCourseData> courses = ViewBag.Courses;
-
-                            foreach (var course in courses)
-                            {
-                                if (cnt++ % 3 == 0)
-                                {
-                                    @:</tr><tr>
-                                }
-                                @:<td>
-                                    <input type="checkbox"
-                                           name="selectedCourses"
-                                           value="@course.CourseId"
-                                           @(Html.Raw(course.Assigned ? "checked=\"checked\"" : "")) />
-                                            @course.CourseId @: @course.Title 
-                                        @:</td>
-                            }
-                            @:</tr>
-                        }
-                    </table>
-                </div>
-            </div>
-
-            
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </div>
-    </div>
-}
-
-<div>
+    }
     @Html.ActionLink("Back to List", "Index")
 </div>
 
-@section Scripts {
-    @Scripts.Render("~/bundles/jqueryval")
-<script type="text/javascript">
+
+
+@section Scripts{
+    <script>
         $(function () {
-            $("#datepicker").datepicker({
+            $("#startdatepicker").datepicker({
+                showOtherMonths: true,
+                selectOtherMonths: true,
                 changeMonth: true,
                 changeYear: true
             });
         });
         $(function () {
-            $("#datepicker2").datepicker({
+            $("#enddatepicker").datepicker({
+                showOtherMonths: true,
+                selectOtherMonths: true,
                 changeMonth: true,
                 changeYear: true
             });
         });
-</script>
+    </script>
 }

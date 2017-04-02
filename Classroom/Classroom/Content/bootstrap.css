@@ -858,7 +858,7 @@ pre code {
 .col-lg-12 {
   position: relative;
   min-height: 1px;
-  padding-right: 0px;
+  padding-right: 15px;
   padding-left: 15px;
 }
 
@@ -3279,7 +3279,7 @@ input[type="button"].btn-block {
 .dropdown-menu > li > a:focus {
   color: #ffffff;
   text-decoration: none;
-  background-color: #428bca;
+  background-color: #ffffff;
 }
 
 .dropdown-menu > .active > a,
@@ -6814,4 +6814,3 @@ td.visible-print {
     display: none !important;
   }
 }
-

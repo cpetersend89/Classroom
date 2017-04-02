@@ -1,0 +1,26 @@
+﻿@model Classroom.ViewModels.VirtualClassroomViewModel
+
+@Html.AntiForgeryToken()
+@Html.HiddenFor(m => m.CompletedAssignment.Id)
+
+<div class="form-group">
+    @Html.LabelFor(m => m.CompletedAssignment.Title)
+    @Html.TextBoxFor(m => m.CompletedAssignment.Title, new { @class = "form-control"})
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(m => m.CompletedAssignment.Description)
+    @Html.TextBoxFor(m => m.CompletedAssignment.Description, new {@class = "form-control"})
+</div>
+
+<div class="form-group">
+    <label>Attach File</label><br /><br />
+    <div class="input-group">
+        <label class="input-group-btn">
+            <span class="btn btn-primary">
+                Browse&hellip; <input type="file" name="file" style="display: none;" multiple>
+            </span>
+        </label>
+        <input type="text" class="form-control" placeholder="No Files Selected" readonly>
+    </div>
+</div>

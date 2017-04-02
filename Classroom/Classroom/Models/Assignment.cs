@@ -1,21 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
-using Classroom.ViewModels;
+﻿using System.Collections.Generic;
 
 namespace Classroom.Models
 {
-    public class Assignment : StudentTaskViewModel
+    public class Assignment : UserTask
     {
-        [Key]
-        public int AssignmentId { get; set; }
-
-        public virtual ICollection<VirtualClassroom> VirtualClassrooms { get; set; }
-        public virtual ICollection<CompletedAssignment> CompletedAssignments { get; set; }
-        public virtual ICollection<CompletedAssignmentFileDetails> CompletedAssignmentsFileDetails { get; set; }
-
+        public int Id { get; set; }
         public virtual ICollection<AssignmentFileDetail> FileDetails { get; set; }
+        public virtual  ICollection<VirtualClassroom> Classrooms { get; set; }
+        public virtual ICollection<CompletedAssignment> CompletedAssignments { get; set; }
+        public virtual ICollection<CompletedAssignmentFileDetails> CompletedAssignmentFileDetails { get; set; }
     }
 }

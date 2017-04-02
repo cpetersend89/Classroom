@@ -1,67 +1,158 @@
-﻿@model IEnumerable<Classroom.Models.Test>
+﻿@model Classroom.ViewModels.VirtualClassroomViewModel
 
-@{
-    ViewBag.Title = "_tests";
-}
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <label>Tests</label>
+    </div>
+    <div class="panel-body">
+        @if (!Model.Tests.Any())
+            {
+            <label>There are no tests at this time</label>
+        }
+        <div id="testAccordion">
 
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Classroom</title>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-    <link rel="stylesheet" href="/resources/demos/style.css">
-    <script>
-        $(function() {
-            $("#accordion2").accordion({
-                collapsible: true
-            });
-        });
-    </script>
-</head>
+            @foreach (var item in Model.Tests)
+            {
+                <h3>
+                    @Html.DisplayFor(modelItem => item.TaskTitle)
+                    <span class="pull-right">
+                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                        Available: @Html.DisplayFor(modelItem => item.AvailableDate) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                        Due: @Html.DisplayFor(modelItem => item.DueDate)
+                    </span>
+                </h3>
 
-<body>
-
-    <div id="accordion2">
-        @foreach (var item in Model)
-        {
-
-            <h3>@Html.DisplayFor(modelItem => item.TaskTitle)<span class="pull-right"><i class="fa fa-calendar" aria-hidden="true"></i> Available: @Html.DisplayFor(modelItem => item.AvailableDate) &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-calendar" aria-hidden="true"></i> Due: @Html.DisplayFor(modelItem => item.DueDate)</span> </h3>
-            <div>
-
-                <form action="VirtualClassrooms\_CompletedAssignments" method="post" enctype="multipart/form-data">
-                    @Html.HiddenFor(modelItem => item.TestId)
-                    <fieldset class="form-group">
-                        <p>@Html.DisplayFor(modelItem => item.TaskDescription)</p>
-                    </fieldset>
-                    <fieldset class="form-group">
-                        <label><i class="fa fa-file" aria-hidden="true"></i> Supporting Files: </label>
+                <div>
+                    <div class="form-group">
+                        @Html.DisplayFor(model => item.TaskDescription)
+                    </div>
+                    <div class="form-group">
+                        <h4><i class="fa fa-file" aria-hidden="true"></i> Supporting Files:</h4>
                         @foreach (var file in item.FileDetails)
                         {
-                            <a class="btn btn-success btn-sm" href="/Assignments/Download/?p=@(file.FileId + file.Extension)&d=@file.FileName">@file.FileName</a>
+                            <a class="btn btn-default btn-sm" href="/Tests/Download/?p=@(file.FileId + file.Extension)&d=@file.FileName">@file.FileName</a>
                         }
-                    </fieldset>
-                    <fieldset>
-                        <p>
-                            @Html.ActionLink("Submit Test", "CompletedTest", new { id = item.TestId }, htmlAttributes: new { @class = "btn btn-info" })
-                        </p>
-                    </fieldset>
+                    </div>
 
-                    <fieldset>
-                        <label>Completed Assignment:</label>
-                        @foreach (var file in item.CompletedTestsFileDetails)
-                        {
-                            <a class="btn btn-success btn-sm" href="/Tests/Download/?p=@(file.FileId + file.Extension)&d=@file.FileName">@file.FileName</a>
-                        }
-                    </fieldset>
-                </form>
-            </div>
-        }
+                    @if (!Model.CompletedTests.Single(a => a.TestId == item.Id).Submitted)
+                    {
+                        @Html.Action("_SubmitTest", "VirtualClassrooms", new {@id = item.Id, classroomId = Model.VirtualClassroom.Id})
+                    }
+                    else
+                    {
+                        <hr/>
+                        <div class="form-group">
+                            <h4><i class="fa fa-file" aria-hidden="true"></i> Completed Test:</h4>
+                        </div>
+
+
+                        @Html.Action("_CompletedTest", "VirtualClassrooms", new {@id = item.Id, classroomId = Model.VirtualClassroom.Id})
+
+                        <div class="form-group">
+                            @foreach (var completedAssignment in item.CompletedTests)
+                            {
+                                foreach (var file in completedAssignment.CompletedTestFileDetails)
+                                {
+                                    <B>
+                                        <a class="btn btn-success btn-sm" href="/Assignments/Download/?p=@(file.FileId + file.Extension)&d=@file.FileName">@file.FileName</a>
+                                        <a href="javascript:void(0);" data-id="@file.FileId" class="deleteAssignment">
+                                            <i class="fa fa-times" style="color: red" aria-hidden="true"></i>
+                                        </a>
+                                    </B>
+                                }
+                            }
+                            <hr/>
+                        </div>
+                    }
+
+
+
+
+
+                    @*<div id="editAssignmentDiv" class="hidden">
+                            @using (Html.BeginForm("_EditAssignment"))
+                            {
+                                @Html.HiddenFor(m => m.VirtualClassroom.Id)
+                                @Model.VirtualClassroom.Id
+                                @item.Id
+                                Html.RenderAction("_EditAssignment", "VirtualClassrooms", new { @id = item.Id, classroomId = Model.VirtualClassroom.Id });
+
+
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-info btn-sm">Submit</button>
+                                    <button type="button" id="cancelAssignment" class="btn btn-link">Cancel</button>
+                                </div>
+                            }
+                        </div>*@
+
+
+
+
+
+                </div>
+            }
+
+        </div>
     </div>
+</div>
 
 
-</body>
+        @section Scripts{
+            <script>
 
-</html>
+
+                $(function () {
+
+                    // We can attach the `fileselect` event to all file inputs on the page
+                    $(document).on('change', ':file', function () {
+                        var input = $(this),
+                            numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                            label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+                        input.trigger('fileselect', [numFiles, label]);
+                    });
+
+                    // We can watch for our custom `fileselect` event like this
+                    $(document).ready(function () {
+                        $(':file').on('fileselect', function (event, numFiles, label) {
+
+                            var input = $(this).parents('.input-group').find(':text'),
+                                log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+                            if (input.length) {
+                                input.val(log);
+                            } else {
+                                if (log) alert(log);
+                            }
+
+                        });
+                    });
+
+                });
+
+                $(function () {
+                    $("#testAccordion").accordion({
+                        collapsible: true,
+                        active: 'none',
+                        heightStyle: "content"
+                    });
+                });
+
+
+            </script>
+            <script>
+                $(function () {
+                    $("#editAssignment").on("click", function () {
+                        $("#editAssignmentDiv").removeClass("hidden");
+                    });
+                });
+            </script>
+
+            <script>
+                $(function () {
+                    $("#cancelAssignment").on("click", function () {
+                        $("#editAssignmentDiv").addClass("hidden");
+                    });
+                });
+            </script>
+        }

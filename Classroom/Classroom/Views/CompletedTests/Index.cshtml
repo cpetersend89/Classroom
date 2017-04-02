@@ -1,0 +1,65 @@
+﻿@model Classroom.ViewModels.VirtualClassroomViewModel
+
+@{
+    Layout = "~/Views/Shared/_InstructorClassroom.cshtml";
+}
+
+
+<div class="panel panel-info">
+    <div class="panel-heading">
+        <label>Submitted Tests for: @Model.Test.TaskTitle</label>
+    </div>
+    <div class="panel-body">
+        @if (Model.CompletedTests.Any())
+        {
+            <table class="table table-striped">
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Test.TaskTitle)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CompletedTest.Student.FullName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CompletedTest.Title)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CompletedTest.Description)
+                    </th>
+                    @*<th>
+                            @Html.DisplayNameFor(model => model.CompletedDateTime)
+                        </th>*@
+                    <th></th>
+                </tr>
+
+                @foreach (var item in Model.CompletedTests)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Test.TaskTitle)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Student.FullName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+                        @*<td>
+                                @Html.DisplayFor(modelItem => item.CompletedDateTime)
+                            </td>*@
+                        <td>
+                            @Html.ActionLink("View/Grade Test", "Edit", new { id = item.Id, classroomId = Model.VirtualClassroom.Id }, new { @class = "btn btn-primary btn-sm" })
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+        else
+        {
+            <p>All submissions for, <strong>@Model.Test.TaskTitle</strong>, have been graded.</p>
+        }
+    </div>
+</div>

@@ -1,0 +1,104 @@
+﻿@using Microsoft.AspNet.Identity
+@model Classroom.ViewModels.VirtualClassroomViewModel
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Classroom</title>
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/themes/base/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jqueryui")
+    <script src="https://use.fontawesome.com/2b3a0c0d9a.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Covered+By+Your+Grace" rel="stylesheet">
+
+
+    <meta name="description" content="The description of my page" />
+</head>
+<body>
+
+    <div class="container">
+        <nav class="navbar navbar-default instructor navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a class="" href="#"><i class="fa fa-globe" aria-hidden="true"></i></a>
+                </li>
+                <li>
+                    <a class="" href="#"><i class="fa fa-envelope-o" aria-hidden="true"></i></a>
+                </li>
+                <li>
+                    <a class="" href="#"><i class="fa fa-bell-o" aria-hidden="true"></i></a>
+                </li>
+            </ul>
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Classroom", "Index", "Home", new {area = ""}, new {@class = "instructor-navbar-brand"})
+            </div>
+
+            <div class="navbar-default instructor sidebar" role="navigation">
+
+                <div class="sidebar-nav navbar-collapse">
+                    <div class="placeholder">
+                        <img src="~/Images/Christian-Peterson.jpg" class="img-fluid" alt="Generic placeholder thumbnail" height="200" width="200">
+                        <p>Hello, @User.Identity.GetUserName()</p>
+                    </div>
+
+                    @using (Html.BeginForm("InstructorClassroom", "VirtualClassrooms"))
+                    {
+                        @Html.DropDownListFor(m => Model.VirtualClassroom.Id, new SelectList(Model.VirtualClassrooms, "Id", "ClassroomName"), new {@class = "sidebar-form-control", onchange = @"form.submit();"})
+                    }
+
+                    <ul class="nav instructor-menu" id="side-menu">
+                        <li>
+                            <a class="instructor-link" href="@Url.Action("InstructorDashboard", "Home")"><i class="fa fa-tachometer" aria-hidden="true"></i>Dashboard</a>
+                        </li>
+                        <li>
+                            <a class="instructor-link" href="@Url.Action("ClassroomAssignments", "Assignments", new {id = Model.VirtualClassroom.Id})"><i class="fa fa-folder-open-o" aria-hidden="true"></i>Assignments</a>
+                        </li>
+                        <li>
+                            <a class="instructor-link" href="@Url.Action("ClassroomTests", "Tests", new { id = Model.VirtualClassroom.Id })"><i class="fa fa-folder-open-o" aria-hidden="true"></i>Tests</a>
+                        </li>
+                    </ul>
+                    @if (Request.IsAuthenticated)
+                    {
+                        using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new {id = "logoutForm"}))
+                        {
+                            @Html.AntiForgeryToken()
+                            <ul class="nav instructor-menu">
+                                <li>
+                                    <a class="instructor-link" href="javascript:document.getElementById('logoutForm').submit()"><i class="fa fa-power-off" aria-hidden="true"></i>Log off</a>
+
+                                </li>
+                            </ul>
+                        }
+                    }
+                </div>
+
+            </div>
+        </nav>
+
+
+        <div class="classroom">
+            <div class="row">
+                <div class="col-lg-12">
+                    @RenderBody()
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryui")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

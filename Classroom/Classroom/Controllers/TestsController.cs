@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Classroom.Models;
+using Classroom.ViewModels;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
@@ -8,21 +11,19 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Classroom.Models;
-using Classroom.ViewModels;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
 
 namespace Classroom.Controllers
 {
+    [Authorize(Roles = "Instructor")]
     public class TestsController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
+        private readonly ApplicationDbContext _context;
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
         public TestsController()
         {
+            _context = new ApplicationDbContext();
         }
 
         public TestsController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
@@ -33,32 +34,57 @@ namespace Classroom.Controllers
 
         public ApplicationSignInManager SignInManager
         {
-            get
-            {
-                return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>();
-            }
-            private set
-            {
-                _signInManager = value;
-            }
+            get { return _signInManager ?? HttpContext.GetOwinContext().Get<ApplicationSignInManager>(); }
+            private set { _signInManager = value; }
         }
 
         public ApplicationUserManager UserManager
         {
-            get
-            {
-                return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            }
-            private set
-            {
-                _userManager = value;
-            }
+            get { return _userManager ?? HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>(); }
+            private set { _userManager = value; }
         }
 
         // GET: Tests
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
-            return View(db.Tests.ToList());
+            var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            var classrooms = user.Instructor.VirtualClassrooms;
+            var viewModel = new VirtualClassroomViewModel()
+            {
+                Tests = new List<Test>(),
+                CompletedTests = new List<CompletedTest>(),
+                VirtualClassrooms = classrooms
+            };
+            foreach (var classroom in classrooms)
+            {
+                foreach (var test in classroom.Tests)
+                {
+                    viewModel.Tests.Add(test);
+                    foreach (var completedTest in test.CompletedTests.Where(s => s.Submitted))
+                    {
+                        viewModel.CompletedTests.Add(completedTest);
+                    }
+                }
+            }
+            return View(viewModel);
+        }
+
+        public async Task<ActionResult> ClassroomTests(int? id)
+        {
+            var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            var classrooms = user.Instructor.VirtualClassrooms;
+            var classroom = _context.VirtualClassrooms.Find(id);
+            var viewModel = new VirtualClassroomViewModel()
+            {
+                VirtualClassroom = classroom,
+                VirtualClassrooms = classrooms,
+                Tests = classroom.Tests.ToList(),
+                CompletedTests = _context.CompletedTests
+                .Where(x => x.VirtualClassroom.Id == id
+                && x.Submitted
+                && x.Graded == false).ToList(),
+            };
+            return View(viewModel);
         }
 
         // GET: Tests/Details/5
@@ -68,7 +94,7 @@ namespace Classroom.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            Test test = db.Tests.Find(id);
+            Test test = _context.Tests.Find(id);
             if (test == null)
             {
                 return HttpNotFound();
@@ -76,103 +102,132 @@ namespace Classroom.Controllers
             return View(test);
         }
 
-        // GET: Tests/Create
-        public ActionResult Create()
+        //// GET: Tests/Create
+        //public async Task<ActionResult> Create()
+        //{
+        //    var user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+        //    var viewModel = new TestsFormViewModel
+        //    {
+        //        VirtualClassrooms = user.Instructor.VirtualClassrooms,
+        //        AvailableDate = null,
+        //        DueDate = null,
+        //    };
+        //    return View(viewModel);
+        //}
+
+        public ActionResult _Create()
         {
-            var test = new Test();
-            test.VirtualClassrooms = new List<VirtualClassroom>();
-            PopulateAssignedClassroomData(test);
-            return View();
+            var user = UserManager.FindById(User.Identity.GetUserId());
+            var viewModel = new VirtualClassroomViewModel()
+            {
+                VirtualClassrooms = user.Instructor.VirtualClassrooms
+            };
+            return PartialView(viewModel);
         }
 
-        // POST: Tests/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "TestId,TaskTitle,TaskDescription,TaskAvailable,AvailableDate,DueDate")] Test test, string[] selectedClassrooms)
+        public ActionResult Create(VirtualClassroomViewModel viewModel, string[] selectedClassrooms)
         {
-            if (selectedClassrooms != null)
+            var test = new Test
             {
-                test.VirtualClassrooms = new List<VirtualClassroom>();
-                foreach (var classroom in selectedClassrooms)
-                {
-                    var classroomToAdd = db.VirtualClassrooms.Find(int.Parse(classroom));
-                    test.VirtualClassrooms.Add(classroomToAdd);
-                }
+                TaskTitle = viewModel.Test.TaskTitle,
+                TaskDescription = viewModel.Test.TaskDescription,
+                TaskAvailable = viewModel.Test.TaskAvailable,
+                AvailableDate = (DateTime)viewModel.Test.AvailableDate,
+                DueDate = (DateTime)viewModel.Test.DueDate,
+                PointsWorth = viewModel.Test.PointsWorth,
+                Classrooms = new List<VirtualClassroom>()
+            };
+            foreach (var classroomId in selectedClassrooms)
+            {
+                var classroom = _context.VirtualClassrooms.Find(int.Parse(classroomId));
+                test.Classrooms.Add(classroom);
             }
-            if (ModelState.IsValid)
+            foreach (var classroom in test.Classrooms)
             {
-                List<TestFileDetail> fileDetails = new List<TestFileDetail>();
-                for (int i = 0; i < Request.Files.Count; i++)
+                foreach (var student in classroom.Students)
                 {
-                    var file = Request.Files[i];
-
-                    if (file != null && file.ContentLength > 0)
+                    Grade grade = new Grade()
                     {
-                        var fileName = Path.GetFileName(file.FileName);
-                        TestFileDetail fileDetail = new TestFileDetail()
-                        {
-                            FileName = fileName,
-                            Extension = Path.GetExtension(fileName),
-                            FileId = Guid.NewGuid()
-                        };
-                        fileDetails.Add(fileDetail);
+                        Id = Guid.NewGuid(),
+                        PointsReceived = 0
+                    };
+                    _context.Grades.Add(grade);
 
-                        var path = Path.Combine(Server.MapPath("~/App_Data/Upload/"),
-                            fileDetail.FileId + fileDetail.Extension);
-                        file.SaveAs(path);
-                    }
+                    var completedTest = new CompletedTest
+                    {
+                        TestId = test.Id,
+                        StudentId = student.StudentId,
+                        CompletedDateTime = null,
+                        VirtualClassroomId = classroom.Id,
+                        GradeId = grade.Id
+                    };
+                    _context.CompletedTests.Add(completedTest);
                 }
-                test.FileDetails = fileDetails;
-                db.Tests.Add(test);
-                db.SaveChanges();
-                return RedirectToAction("Index");
             }
-            PopulateAssignedClassroomData(test);
-            return View(test);
+            test.FileDetails = AddFilesDetailsToTest();
+            _context.Tests.Add(test);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
         }
 
-        // GET: Tests/Edit/5
-        public ActionResult Edit(int? id)
+        private List<TestFileDetail> AddFilesDetailsToTest()
         {
-            var tests = new Test();
-            tests.VirtualClassrooms = new List<VirtualClassroom>();
-            PopulateAssignedClassroomData(tests);
-            if (id == null)
+            List<TestFileDetail> fileDetails = new List<TestFileDetail>();
+            for (int i = 0; i < Request.Files.Count; i++)
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                var file = Request.Files[i];
+
+                if (file != null && file.ContentLength > 0)
+                {
+                    var fileName = Path.GetFileName(file.FileName);
+                    TestFileDetail fileDetail = new TestFileDetail()
+                    {
+                        FileName = fileName,
+                        Extension = Path.GetExtension(fileName),
+                        FileId = Guid.NewGuid()
+                    };
+                    fileDetails.Add(fileDetail);
+
+                    var path = Path.Combine(Server.MapPath("~/App_Data/Upload/"),
+                        fileDetail.FileId + fileDetail.Extension);
+                    file.SaveAs(path);
+                }
             }
-            Test test = db.Tests.Include(s => s.FileDetails).SingleOrDefault(x => x.TestId == id);
-            if (test == null)
-            {
-                return HttpNotFound();
-            }
-            return View(test);
+            return fileDetails;
         }
 
         public FileResult Download(string p, string d)
         {
-            return File(Path.Combine(Server.MapPath("~/App_Data/Upload/"), p), System.Net.Mime.MediaTypeNames.Application.Octet, d);
+            return File(Path.Combine(Server.MapPath("~/App_Data/Upload/"), p),
+                System.Net.Mime.MediaTypeNames.Application.Octet, d);
         }
 
-        // POST: Tests/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        public ActionResult Edit(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+            Test test = _context.Tests
+                .Include(f => f.FileDetails)
+                .SingleOrDefault(a => a.Id == id);
+            if (test == null)
+            {
+                return HttpNotFound();
+            }
+            return View(test);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "TestId,TaskTitle,TaskDescription,TaskAvailable,AvailableDate,DueDate")] Test test, string[] selectedClassrooms)
+        public ActionResult Edit(
+            [Bind(Include = "Id,TaskTitle,TaskDescription,TaskAvailable,AvailableDate,DueDate,PointsWorth")] Test
+                test)
         {
-            if (selectedClassrooms != null)
-            {
-                test.VirtualClassrooms = new List<VirtualClassroom>();
-                foreach (var classroom in selectedClassrooms)
-                {
-                    var classroomToAdd = db.VirtualClassrooms.Find(int.Parse(classroom));
-                    test.VirtualClassrooms.Add(classroomToAdd);
-                }
-            }
             if (ModelState.IsValid)
             {
                 for (int i = 0; i < Request.Files.Count; i++)
@@ -187,59 +242,20 @@ namespace Classroom.Controllers
                             FileName = fileName,
                             Extension = Path.GetExtension(fileName),
                             FileId = Guid.NewGuid(),
-                            TestId = test.TestId
+                            TestId = test.Id
                         };
-                        var path = Path.Combine(Server.MapPath("~/App_Data/Upload/"), fileDetail.FileId + fileDetail.Extension);
+                        var path = Path.Combine(Server.MapPath("~/App_Data/Upload/"),
+                            fileDetail.FileId + fileDetail.Extension);
                         file.SaveAs(path);
 
-                        db.Entry(fileDetail).State = EntityState.Added;
+                        _context.Entry(fileDetail).State = EntityState.Added;
                     }
                 }
-                db.Entry(test).State = EntityState.Modified;
-                db.SaveChanges();
+                _context.Entry(test).State = EntityState.Modified;
+                _context.SaveChanges();
                 return RedirectToAction("Index");
             }
             return View(test);
-        }
-
-        private void PopulateAssignedClassroomData(Test test)
-        {
-            ApplicationUser user = UserManager.FindById(User.Identity.GetUserId());
-            var adminVirtualClassrooms = db.VirtualClassrooms;
-            var instructorVirtualClassrooms =
-                db.VirtualClassrooms
-                    .Where(x => x.Instructors.All(i => i.InstructorId == user.Instructor.InstructorId));
-            var testsClassroom = new HashSet<int>(test.VirtualClassrooms.Select(c => c.VirtualClassroomId));
-            var viewModel = new List<AssignedClassroomData>();
-            if (User.Identity.IsAuthenticated)
-            {
-                if (User.IsInRole("Admin"))
-                {
-                    foreach (var classroom in adminVirtualClassrooms)
-                    {
-                        viewModel.Add(new AssignedClassroomData
-                        {
-                            VirtualClassroomId = classroom.VirtualClassroomId,
-                            ClassroomTitle = classroom.ClassroomTitle,
-                            Assigned = testsClassroom.Contains(classroom.VirtualClassroomId)
-                        });
-                    }
-                }
-                if (User.IsInRole("Instructor"))
-                {
-                    foreach (var classroom in instructorVirtualClassrooms)
-                    {
-                        viewModel.Add(new AssignedClassroomData
-                        {
-                            VirtualClassroomId = classroom.VirtualClassroomId,
-                            ClassroomTitle = classroom.ClassroomTitle,
-                            Assigned = testsClassroom.Contains(classroom.VirtualClassroomId)
-                        });
-                    }
-                }
-            }
-
-            ViewBag.VirtualClassrooms = viewModel;
         }
 
         [HttpPost]
@@ -253,7 +269,7 @@ namespace Classroom.Controllers
             try
             {
                 Guid guid = new Guid(id);
-                TestFileDetail fileDetail = db.TestFileDetails.Find(guid);
+                TestFileDetail fileDetail = _context.TestFileDetails.Find(guid);
                 if (fileDetail == null)
                 {
                     Response.StatusCode = (int)HttpStatusCode.NotFound;
@@ -261,8 +277,8 @@ namespace Classroom.Controllers
                 }
 
                 //Remove from database
-                db.TestFileDetails.Remove(fileDetail);
-                db.SaveChanges();
+                _context.TestFileDetails.Remove(fileDetail);
+                _context.SaveChanges();
 
                 //Delete file from the file system
                 var path = Path.Combine(Server.MapPath("~/App_Data/Upload/"), fileDetail.FileId + fileDetail.Extension);
@@ -284,7 +300,7 @@ namespace Classroom.Controllers
         {
             try
             {
-                Test test = db.Tests.Find(id);
+                Test test = _context.Tests.Find(id);
                 if (test == null)
                 {
                     Response.StatusCode = (int)HttpStatusCode.NotFound;
@@ -302,8 +318,8 @@ namespace Classroom.Controllers
                     }
                 }
 
-                db.Tests.Remove(test);
-                db.SaveChanges();
+                _context.Tests.Remove(test);
+                _context.SaveChanges();
                 return Json(new { Result = "OK" });
             }
             catch (Exception ex)
@@ -316,7 +332,18 @@ namespace Classroom.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                if (_userManager != null)
+                {
+                    _userManager.Dispose();
+                    _userManager = null;
+                }
+
+                if (_signInManager != null)
+                {
+                    _signInManager.Dispose();
+                    _signInManager = null;
+                }
+                _context.Dispose();
             }
             base.Dispose(disposing);
         }

@@ -1,0 +1,77 @@
+﻿@model Classroom.ViewModels.VirtualClassroomViewModel
+
+@{
+    Layout = "~/Views/Shared/_StudentClassroom.cshtml";
+}
+
+@Html.Action("_Assignments", "VirtualClassrooms", new { @id = Model.VirtualClassroom.Id })
+@Html.Action("_Tests", "VirtualClassrooms", new { @id = Model.VirtualClassroom.Id })
+
+
+
+
+@section Scripts{
+    <script>
+
+
+        $(function () {
+
+            // We can attach the `fileselect` event to all file inputs on the page
+            $(document).on('change', ':file', function () {
+                var input = $(this),
+                    numFiles = input.get(0).files ? input.get(0).files.length : 1,
+                    label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+                input.trigger('fileselect', [numFiles, label]);
+            });
+
+            // We can watch for our custom `fileselect` event like this
+            $(document).ready(function () {
+                $(':file').on('fileselect', function (event, numFiles, label) {
+
+                    var input = $(this).parents('.input-group').find(':text'),
+                        log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+                    if (input.length) {
+                        input.val(log);
+                    } else {
+                        if (log) alert(log);
+                    }
+
+                });
+            });
+
+        });
+
+        $(function () {
+            $("#assignmentAccordion").accordion({
+                collapsible: true,
+                active: 'none',
+                heightStyle: "content"
+            });
+        });
+        $(function () {
+            $("#testAccordion").accordion({
+                collapsible: true,
+                active: 'none',
+                heightStyle: "content"
+            });
+        });
+
+
+    </script>
+    <script>
+        $(function () {
+            $("#editAssignment").on("click", function () {
+                $("#editAssignmentDiv").removeClass("hidden");
+            });
+        });
+    </script>
+
+    <script>
+        $(function () {
+            $("#cancelAssignment").on("click", function () {
+                $("#editAssignmentDiv").addClass("hidden");
+            });
+        });
+    </script>
+}

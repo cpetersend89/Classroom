@@ -1,0 +1,89 @@
+﻿@model IEnumerable<Classroom.Models.VirtualClassroom>
+
+@{
+    ViewBag.Title = "Classrooms";
+    Layout = "~/Views/Shared/_Admin.cshtml";
+
+}
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        New Classroom
+    </div>
+    <div class="panel-body">
+        @Html.Action("_Create", "VirtualClassrooms")
+    </div>
+</div>
+
+<div class="panel panel-danger">
+    <div class="panel-heading">
+        Classrooms
+    </div>
+    <div class="panel-body">
+        <table class="table table-striped">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.ClassroomName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Semester)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Course)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Instructors)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Students)
+                </th>
+
+
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ClassroomName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Semester.Title)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Course.Name)
+                    </td>
+                    <td>
+                        @if (item.Instructors.Count() == 0)
+                        {
+                            <span>No Instructors</span>
+                        }
+                        else
+                        {
+                            <span>@item.Instructors.Count() Instructor(s)</span>
+                        }
+                    </td>
+                    <td>
+                        @if (item.Students.Count() == 0)
+                {
+                            <span>No Students</span>
+                        }
+                        else
+                        {
+                            <span>@item.Students.Count() Student(s)</span>
+                        }
+                    </td>
+
+
+                    <td>
+                        @Html.ActionLink(" ", "Edit", new { id = item.Id }, new { @class = "fa fa-pencil-square-o btn btn-primary btn-sm", title = "Edit" })
+                        @Html.ActionLink(" ", "Details", new { id = item.Id }, new { @class = "fa fa-list btn btn-success btn-sm", title = "Details" })
+                        @Html.ActionLink(" ", "Delete", new { id = item.Id }, new { @class = "fa fa-trash-o btn btn-danger btn-sm", title = "Delete" })
+                    </td>
+                </tr>
+            }
+
+        </table>
+    </div>
+</div>

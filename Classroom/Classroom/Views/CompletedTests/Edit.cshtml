@@ -1,0 +1,87 @@
+﻿@model Classroom.ViewModels.VirtualClassroomViewModel
+
+@{
+    Layout = "~/Views/Shared/_InstructorClassroom.cshtml";
+}
+
+
+<div class="classroom-form">
+    <h4>@Model.CompletedTest.Test.TaskTitle</h4>
+
+    @using (Html.BeginForm())
+    {
+        @Html.AntiForgeryToken()
+
+
+
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.CompletedTest.Id)
+        @Html.HiddenFor(model => model.CompletedTest.TestId)
+        @Html.HiddenFor(model => model.CompletedTest.StudentId)
+        @Html.HiddenFor(model => model.CompletedTest.VirtualClassroomId)
+        @Html.HiddenFor(model => model.CompletedTest.GradeId)
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CompletedTest.Title)
+
+            @Html.EditorFor(model => model.CompletedTest.Title, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.CompletedTest.Title, "", new { @class = "text-danger" })
+
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CompletedTest.Description)
+
+            @Html.EditorFor(model => model.CompletedTest.Description, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.CompletedTest.Description, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            @Html.Label("Attached Files")
+            @foreach (var file in Model.CompletedTest.CompletedTestFileDetails)
+                {
+                <B>
+                    <a class="btn btn-success btn-sm" href="/Tests/Download/?p=@(file.FileId + file.Extension)&d=@file.FileName">@file.FileName</a>
+                    <a href="javascript:void(0);" data-id="@file.FileId" class="deleteTest">
+                        <i class="fa fa-times" style="color: red" aria-hidden="true"></i>
+                    </a>
+                </B>
+            }
+
+
+        </div>
+
+
+
+
+        @*<div class="form-group">
+                @Html.LabelFor(model => model.CompletedDateTime)
+
+                @Html.EditorFor(model => model.CompletedDateTime, new {htmlAttributes = new {@class = "form-control"}})
+                @Html.ValidationMessageFor(model => model.CompletedDateTime, "", new {@class = "text-danger"})
+
+            </div>*@
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CompletedTest.Grade.PointsReceived)
+
+            @Html.EditorFor(model => model.CompletedTest.Grade.PointsReceived, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.CompletedTest.Grade.PointsReceived, "", new { @class = "text-danger" })
+
+        </div>
+
+
+
+        <div class="form-group">
+
+            <input type="submit" value="Save" class="btn btn-default" />
+
+        </div>
+    }
+
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+</div>

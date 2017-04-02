@@ -1,25 +1,27 @@
-﻿using System;
-using System.Globalization;
+﻿using Classroom.Models;
+using Classroom.ViewModels;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security;
+using System.Data.Entity.Migrations;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin.Security;
-using Classroom.Models;
 
 namespace Classroom.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
+        private readonly ApplicationDbContext _context;
         private ApplicationSignInManager _signInManager;
         private ApplicationUserManager _userManager;
 
         public AccountController()
         {
+            _context = new ApplicationDbContext();
         }
 
         public AccountController(ApplicationUserManager userManager, ApplicationSignInManager signInManager )
@@ -57,6 +59,14 @@ namespace Classroom.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
+            if (Request.IsAuthenticated)
+            {
+                if (User.IsInRole("Student"))
+                {
+                    return RedirectToAction("StudentDashboard", "Home");
+                }
+
+            }
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }
@@ -134,6 +144,201 @@ namespace Classroom.Controllers
             }
         }
 
+        [AllowAnonymous]
+        public ActionResult CreateUser()
+        {
+            var viewModel = new CreateUserFormViewModel
+            {
+                UserRoles = _context.Roles.ToList()
+            };
+            return View(viewModel);
+        }
+
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> CreateUser(CreateUserFormViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                switch (viewModel.RoleId)
+                {
+                    case "1":
+                        var adminUser = new ApplicationUser()
+                        {
+                            UserName = viewModel.Email,
+                            Email = viewModel.Email,
+                            EmailConfirmed = true,
+                            Admin = new Admin()
+                            {
+                                FirstName = viewModel.FirstName,
+                                LastName = viewModel.LastName,
+                                Email = viewModel.Email,
+                                Active = viewModel.Active
+                            }
+                        };
+                        var adminRole = new IdentityUserRole()
+                        {
+                            RoleId = viewModel.RoleId,
+                            UserId = adminUser.Id
+                        };
+                        var adminResult = await UserManager.CreateAsync(adminUser); // Create without password.
+                        if (adminResult.Succeeded)
+                        {
+                            _context.Set<IdentityUserRole>().AddOrUpdate(adminRole);
+                            _context.SaveChanges();
+                            await SendActivationMail(adminUser);
+                            TempData["AlertMessage"] = "User has been added";
+                            return RedirectToAction("CreateUser");
+                        }
+                        foreach (var error in adminResult.Errors)
+                        {
+                            ModelState.AddModelError("", error);
+                        }
+                        break;
+                    case "2":
+                        var instructorUser = new ApplicationUser()
+                        {
+                            UserName = viewModel.Email,
+                            Email = viewModel.Email,
+                            EmailConfirmed = true,
+                            Instructor = new Instructor()
+                            {
+                                FirstName = viewModel.FirstName,
+                                LastName = viewModel.LastName,
+                                Email = viewModel.Email,
+                                Active = viewModel.Active
+                            }
+                        };
+                        var instructorRole = new IdentityUserRole()
+                        {
+                            RoleId = viewModel.RoleId,
+                            UserId = instructorUser.Id
+                        };
+                        var instructorResult = await UserManager.CreateAsync(instructorUser); // Create without password.
+                        if (instructorResult.Succeeded)
+                        {
+                            _context.Set<IdentityUserRole>().AddOrUpdate(instructorRole);
+                            _context.SaveChanges();
+                            await SendActivationMail(instructorUser);
+                            TempData["AlertMessage"] = "User has been added";
+                            return RedirectToAction("CreateUser");
+                        }
+                        foreach (var error in instructorResult.Errors)
+                        {
+                            ModelState.AddModelError("", error);
+                        }
+                        break;
+                    case "3":
+                        var studentUser = new ApplicationUser()
+                        {
+                            UserName = viewModel.Email,
+                            Email = viewModel.Email,
+                            EmailConfirmed = true,
+                            Student = new Student()
+                            {
+                                FirstName = viewModel.FirstName,
+                                LastName = viewModel.LastName,
+                                Email = viewModel.Email,
+                                Active = viewModel.Active
+                            }
+                        };
+                        var studentRole = new IdentityUserRole()
+                        {
+                            RoleId = viewModel.RoleId,
+                            UserId = studentUser.Id
+                        };
+                        var studentResult = await UserManager.CreateAsync(studentUser); // Create without password.
+                        if (studentResult.Succeeded)
+                        {
+                            _context.Set<IdentityUserRole>().AddOrUpdate(studentRole);
+                            _context.SaveChanges();
+                            await SendActivationMail(studentUser);
+                            TempData["AlertMessage"] = "User has been added";
+                            return RedirectToAction("CreateUser");
+                        }
+                        foreach (var error in studentResult.Errors)
+                        {
+                            ModelState.AddModelError("", error);
+                        }
+                        break;
+                }
+            }
+            return View(viewModel);
+        }
+
+        private async Task SendActivationMail(ApplicationUser user)
+        {
+            string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+            string firstName = "";
+            if (user.Admin != null)
+            {
+                firstName = user.Admin.FirstName;
+            }
+            if (user.Instructor != null)
+            {
+                firstName = user.Instructor.FirstName;
+            }
+            if (user.Student != null)
+            {
+                firstName = user.Student.FirstName;
+            }
+
+
+            // Using protocol param will force creation of an absolut url. We
+            // don't want to send a relative URL by e-mail.
+            var callbackUrl = Url.Action(
+              "RegisterFromEmail",
+              "Account",
+              new { userId = user.Id, code = code },
+              protocol: Request.Url.Scheme);
+
+            string body = $"<h4>Hello {firstName}, welcome to Classroom!</h4>" +
+                          $"<p>To get started, please <a href='{callbackUrl}'>activate</a> your account.</p>" +
+                          $"<p>The account must be activated within 24 hours from receiving this mail.</p>";
+
+            await UserManager.SendEmailAsync(user.Id, "Welcome to Classroom!", body);
+        }
+
+        [AllowAnonymous]
+        public ActionResult RegisterFromEmail(string code)
+        {
+            return code == null ? View("Error") : View();
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> RegisterFromEmail(RegisterFromEmailViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(viewModel);
+            }
+            var user = await UserManager.FindByNameAsync(viewModel.Email);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                return RedirectToAction("ResetPasswordConfirmation", "Account");
+            }
+            var result = await UserManager.ResetPasswordAsync(user.Id, viewModel.Code, viewModel.Password);
+            if (result.Succeeded)
+            {
+                // Automatic sign in after password has been reset.
+                SignInManager.SignIn(user, false, false);
+                return RedirectToAction("Index", "Home");
+            }
+            AddErrors(result);
+            return View();
+        }
+
+        [AllowAnonymous]
+        public ActionResult RegisterFromEmailConfirmation()
+        {
+            return View();
+        }
+
         //
         // GET: /Account/Register
         [AllowAnonymous]
@@ -151,7 +356,11 @@ namespace Classroom.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email
+                };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -159,9 +368,9 @@ namespace Classroom.Controllers
                     
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // Send an email with this link
-                    string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
-                    var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
-                    await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                    // string code = await UserManager.GenerateEmailConfirmationTokenAsync(user.Id);
+                    // var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);
+                    // await UserManager.SendEmailAsync(user.Id, "Confirm your account", "Please confirm your account by clicking <a href=\"" + callbackUrl + "\">here</a>");
 
                     return RedirectToAction("Index", "Home");
                 }
@@ -211,10 +420,10 @@ namespace Classroom.Controllers
 
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                 // Send an email with this link
-                string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
-                var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
-                await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
-                return RedirectToAction("ForgotPasswordConfirmation", "Account");
+                // string code = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+                // var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: Request.Url.Scheme);		
+                // await UserManager.SendEmailAsync(user.Id, "Reset Password", "Please reset your password by clicking <a href=\"" + callbackUrl + "\">here</a>");
+                // return RedirectToAction("ForgotPasswordConfirmation", "Account");
             }
 
             // If we got this far, something failed, redisplay form
@@ -263,52 +472,13 @@ namespace Classroom.Controllers
             return View();
         }
 
+        //
         // GET: /Account/ResetPasswordConfirmation
         [AllowAnonymous]
         public ActionResult ResetPasswordConfirmation()
         {
             return View();
         }
-
-        [AllowAnonymous]
-        public ActionResult CreatePasswordFromEmail(string code)
-        {
-            return code == null ? View("Error") : View();
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> CreatePasswordFromEmail(CreatePasswordFromEmailViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-            var user = await UserManager.FindByNameAsync(model.Email);
-            if (user == null)
-            {
-                // Don't reveal that the user does not exist
-                return RedirectToAction("ResetPasswordConfirmation", "Account");
-            }
-            var result = await UserManager.ResetPasswordAsync(user.Id, model.Code, model.Password);
-            if (result.Succeeded)
-            {
-                // Automatic sign in after password has been reset.
-                SignInManager.SignIn(user, false, false);
-                return RedirectToAction("CreatePasswordFromEmailConfirmation", "Account");
-            }
-            AddErrors(result);
-            return View();
-        }
-
-        [AllowAnonymous]
-        public ActionResult CreatePasswordFromEmailConfirmation()
-        {
-            return View();
-        }
-
-
 
         //
         // POST: /Account/ExternalLogin
@@ -431,7 +601,7 @@ namespace Classroom.Controllers
         public ActionResult LogOff()
         {
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
-            return RedirectToAction("Login", "Home");
+            return RedirectToAction("Login");
         }
 
         //

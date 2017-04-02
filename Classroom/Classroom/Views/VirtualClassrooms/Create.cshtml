@@ -1,116 +1,63 @@
-﻿@model Classroom.Models.VirtualClassroom
-
+﻿@model Classroom.ViewModels.VirtualClassroomFormViewModel
 @{
     ViewBag.Title = "Create";
 }
 
-<h2>Create</h2>
 
+<div class="classroom-form">
+<h2>New Classroom</h2>
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm("Create", "VirtualClassrooms"))
 {
     @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">
-        <h4>Classroom</h4>
-        <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        <div class="form-group">
-            @Html.LabelFor(model => model.ClassroomTitle, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.ClassroomTitle, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.ClassroomTitle, "", new { @class = "text-danger" })
-            </div>
-        </div>
+    <p class="alert alert-info">All fields are <strong>required</strong>.</p>
+    <hr/>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.CourseId, "CourseId", htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownList("CourseId", null, htmlAttributes: new { @class = "form-control" })
-                @Html.ValidationMessageFor(model => model.CourseId, "", new { @class = "text-danger" })
-            </div>
-        </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.ClassroomName)
+        @Html.TextBoxFor(m => m.ClassroomName, new {@class = "form-control", autofocus = "autofocus"})
+        @Html.ValidationMessageFor(m => m.ClassroomName, "", new {@class = "text-danger"})
+    </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.SemesterId, "SemesterId", htmlAttributes: new {@class = "control-label col-md-2"})
-            <div class="col-md-10">
-                @Html.DropDownList("SemesterId", null, htmlAttributes: new {@class = "form-control"})
-                @Html.ValidationMessageFor(model => model.SemesterId, "", new {@class = "text-danger"})
-            </div>
-        </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.SemesterId)
+        @Html.DropDownListFor(m => m.SemesterId, new SelectList(Model.Semesters, "Id", "Title"), "", new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.SemesterId, "", new { @class = "text-danger" })
+    </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.Instructors, "Instructors", htmlAttributes: new {@class = "control-label col-md-2"})
-            <div class="col-md-10">
-                <table>
-                    <tr>
-                    @{
-                        int cnt = 0;
-                        List<Classroom.ViewModels.AssignedInstructorData> instructors = ViewBag.Instructors;
+    <div class="form-group">
+        @Html.LabelFor(m => m.CourseId)
+        @Html.DropDownListFor(m => m.CourseId, new SelectList(Model.Courses, "Id", "Name"), "", new {@class = "form-control"})
+        @Html.ValidationMessageFor(m => m.CourseId, "", new {@class = "text-danger"})
+    </div>
 
-                        foreach (var instructor in instructors)
-                        {
-                            if (cnt++%3 == 0)
-                            {
-                                @:</tr><tr>
-                            }
-                            @:<td>
-                            <input type="checkbox"
-                                   name="selectedInstructors"
-                                   value="@instructor.InstructorId"
-                                   @(Html.Raw(instructor.Assigned ? "checked=\"checked\"" : ""))/>
-                            @instructor.InstructorId
-                            @: @instructor.FullName
-                            @:</td>
-                        }
-                        @:</tr>
-                    }
-                </table>
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.Students, "Students", htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                <table>
-                    <tr>
-                        @{
-                            int count = 0;
-                            List<Classroom.ViewModels.AssignedStudentData> students = ViewBag.Students;
-
-                            foreach (var student in students)
-                            {
-                                if (count++ % 3 == 0)
-                                {
-                                    @:</tr><tr>
-                            }
-                                @:<td>
-                                    <input type="checkbox"
-                                           name="selectedStudents"
-                                           value="@student.StudentId"
-                                           @(Html.Raw(student.Assigned ? "checked=\"checked\"" : "")) />
-                                    @student.StudentId
-                                    @: @student.FullName
-                                    @:</td>
-                        }
-                            @:</tr>
-                        }
-                    </table>
-                </div>
-            </div>
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Instructors)
+        <div class="form-group checkboxlist">
+            @foreach (var instructor in Model.Instructors)
+            {
+                <input type="checkbox" name="selectedInstructors" value="@instructor.InstructorId"/>
+                @instructor.FullName<br/>
+            }
         </div>
     </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Students)
+        <div class="form-group checkboxlist">
+            @foreach (var student in Model.Students)
+            {
+                <input type="checkbox" name="selectedStudents" value="@student.StudentId" />
+                @student.FullName<br />
+            }
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
 }
+    </div>
 
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
-
-@section Scripts {
+@section Scripts{
     @Scripts.Render("~/bundles/jqueryval")
 }
+

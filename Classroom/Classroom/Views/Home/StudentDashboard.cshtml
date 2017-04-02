@@ -1,0 +1,105 @@
+﻿@model Classroom.ViewModels.VirtualClassroomViewModel
+
+@{
+    Layout = "~/Views/Shared/_Student.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <label>Upcoming Assignments: A Seven Day Look</label>
+            </div>
+            <div class="panel-body">
+                @if (Model.CompletedAssignments.Any())
+                {
+                    <table class="table table-striped">
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(m => m.VirtualClassroom.ClassroomName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(m => m.Assignment.TaskTitle)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(m => m.Assignment.DueDate)
+                            </th>
+                        </tr>
+                        @foreach (var item in Model.CompletedAssignments)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(model => item.VirtualClassroom.ClassroomName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(model => item.Assignment.TaskTitle)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(model => item.Assignment.DueDate)
+                                </td>
+                            </tr>
+                        }
+
+                    </table>
+                }
+                else
+                {
+                    <p>No assignments are due this week</p>
+                }
+
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <label>Upcoming Test: A Seven Day Look</label>
+            </div>
+            <div class="panel-body">
+                @if (Model.CompletedTests.Any())
+                {
+                    <table class="table table-striped">
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(m => m.VirtualClassroom.ClassroomName)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(m => m.Test.TaskTitle)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(m => m.Test.DueDate)
+                            </th>
+                        </tr>
+                        @foreach (var item in Model.CompletedTests)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(model => item.VirtualClassroom.ClassroomName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(model => item.Test.TaskTitle)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(model => item.Test.DueDate)
+                                </td>
+                            </tr>
+                        }
+
+                    </table>
+                }
+                else
+                {
+                    <p>No tests are due at this week</p>
+                }
+
+            </div>
+
+        </div>
+    </div>
+</div>
+

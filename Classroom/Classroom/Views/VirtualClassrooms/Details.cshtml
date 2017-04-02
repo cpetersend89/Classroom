@@ -3,59 +3,45 @@
 @{
     ViewBag.Title = "Details";
 }
-
-<h2>Details</h2>
-
 <div>
-    <h4>Classroom</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Course.CourseTitle)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Course.CourseTitle)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.Semester.SemesterTitle)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Semester.SemesterTitle)
-        </dd>
-
-        <dt>
-            @Html.DisplayNameFor(model => model.ClassroomTitle)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.ClassroomTitle)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Instructors)
-        </dt>
-        <dd>
-            @foreach (var instructor in Model.Instructors)
-            {
-                @instructor.InstructorId
-                @: @instructor.FullName<br/>
-            }
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Students)
-        </dt>
-        <dd>
-            @foreach (var student in Model.Students)
-            {
-                @student.StudentId @: @student.FullName<br />
-            }
-        </dd>
-
-    </dl>
-</div>
-<p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.VirtualClassroomId }) |
-    @Html.ActionLink("Back to List", "Index")
-</p>
+        <h4>VirtualClassroom</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Course.Name)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.Course.Name)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.Semester.Title)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.Semester.Title)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.AdministratorId)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.AdministratorId)
+            </dd>
+    
+            <dt>
+                @Html.DisplayNameFor(model => model.ClassroomName)
+            </dt>
+    
+            <dd>
+                @Html.DisplayFor(model => model.ClassroomName)
+            </dd>
+    
+        </dl>
+    </div>
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
+        @Html.ActionLink("Back to List", "StudentClassroom")
+    </p>

@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
-using Classroom.ViewModels;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Classroom.Models
 {
-    public class Admin : UserProfileViewModel
+    public class Admin : UserProfile
     {
         [Key]
         [Display(Name = "Admin Id")]

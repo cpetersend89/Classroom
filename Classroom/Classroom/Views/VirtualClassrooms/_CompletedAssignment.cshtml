@@ -1,0 +1,16 @@
+﻿@model Classroom.ViewModels.VirtualClassroomViewModel
+
+@Html.AntiForgeryToken()
+@Html.HiddenFor(m => m.CompletedAssignment.Id)
+
+<div class="form-group">
+    @Html.LabelFor(m => m.CompletedAssignment.Title)
+    @Html.DisplayFor(m => m.CompletedAssignment.Title, new { @class = "form-control" })
+</div>
+
+<div class="form-group">
+    @Html.LabelFor(m => m.CompletedAssignment.Description)
+    @Html.DisplayFor(m => m.CompletedAssignment.Description, new { @class = "form-control" })
+</div>
+
+
